@@ -11,6 +11,8 @@ Ein leistungsstarkes, lokales SEO-Dashboard zur blitzschnellen Analyse von Ranki
 
 **👉 Direkt ausprobieren — ohne Installation: [gsc-ranking-changes-analyzer.streamlit.app](https://gsc-ranking-changes-analyzer.streamlit.app/)**
 
+![GSC Ranking Changes Analyzer dashboard](dasbhoard-20260613.png)
+
 ---
 
 ## 🌟 Kern-Features
