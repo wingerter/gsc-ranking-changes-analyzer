@@ -1,79 +1,103 @@
-# Google Search Console (GSC) Ranking Change Analyzer
+# 📉 GSC Ranking Changes Analyzer
 
-Ein leistungsstarkes, lokales SEO-Dashboard zur blitzschnellen Analyse von Ranking- und Traffic-Veränderungen aus der Google Search Console. Entwickelt für SEOs, um aus dem rohen "Zeitraum-Vergleichs-Export" der GSC sofortige Handlungsempfehlungen, Themen-Cluster und präzise Absturz-Analysen abzuleiten.
+A fast, local SEO dashboard for analyzing ranking and traffic changes from Google Search Console. Drop in the raw **date-comparison export** (`Queries.csv`), and instantly get topic clusters, prioritized ranking-drop analysis, and quick-win opportunities — no spreadsheets, no API keys, no data leaving your machine.
 
----
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Open_App-FF4B4B?logo=streamlit&logoColor=white)](https://gsc-ranking-changes-analyzer.streamlit.app/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Built with Streamlit](https://img.shields.io/badge/Built_with-Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
 
-## 🌟 Kern-Features
+> 🌍 *Read this in [German / Deutsch](README.de.md).*
 
-*   **🌐 100% Sprach- & Format-Unabhängig (Positional Parsing):** Es ist völlig egal, ob deine GSC auf Deutsch ("Häufigste Suchanfragen") oder Englisch ("Top queries") steht oder ob Dezimalzahlen mit Komma oder Punkt exportiert wurden. Das Skript liest die Daten stur anhand ihrer GSC-Standardposition aus und übersetzt sie automatisch.
-*   **🌍 Zweisprachiges UI:** Das gesamte Dashboard lässt sich mit einem Klick zwischen Deutsch und Englisch umschalten (inkl. Flaggen-Icons).
-*   **🤖 KI-Freies NLP-Clustering:** Clustert tausende Keywords vollautomatisch und in Millisekunden in Themenbereiche (Head-Terms) – komplett lokal und ohne teure API-Kosten. Inklusive visueller Heatmap für die besten und schlechtesten Cluster.
-*   **🎯 Intelligente Change-Metriken:** Berechnet nicht nur simple Differenzen, sondern taggt Keywords automatisch nach harten Ranking-Grenzen (`New`, `OoTop3`, `OoTop10`, `OoSERP2`, `OoTop100`, `IntoTop10`). Mikro-Schwankungen (< 1.0) werden sauber als `None` getrennt, alle anderen als `Changed`.
-*   **🍎 Low Hanging Fruits:** Identifiziert "Schwellen-Keywords", die auf Seite 2 ranken (Position 11-15), aber bereits echte Impressionen generieren – die schnellsten Quick-Wins im SEO.
-*   **📊 Interaktives Dashboard:** Eine massive KPI-Matrix direkt nach dem Upload zeigt dir Total-Verluste, Netto-Veränderungen, Top 3 & Top 10 Abstürze sowie die Performance deiner Themen-Cluster auf einen Blick.
+**👉 Try it now — no install needed: [gsc-ranking-changes-analyzer.streamlit.app](https://gsc-ranking-changes-analyzer.streamlit.app/)**
 
----
-
-## 📑 Aufbau der Analyse (Die 6 Tabs)
-
-Sobald du deine `Queries.csv` hochgeladen hast, generiert die App 6 interaktive Analyse-Reiter:
-
-1.  **Themen-Cluster:** Bündelt die Keyword-Verluste nach Begriffen. Erkennt sofort, ob ein bestimmtes Themenfeld (z.B. "Winterreifen" oder "Kreditkarte") kollektiv abgestürzt ist. Du kannst gezielt Brand-Keywords herausfiltern.
-2.  **Ranking Drops:** Sortiert die Abstürze in priorisierte Kategorien:
-    *   **Top 3 Drops:** Der absolute Schmerz (von Platz 1-3 auf 4+ gefallen).
-    *   **Top 10 Drops:** Aus der Seite 1 gerutscht.
-    *   **Seite 2 Drops:** Von Seite 2 weiter nach hinten.
-    *   **Komplette Verluste:** Aus den Top 100 gefallen.
-3.  **Klick-Verluste (Detail):** Die reine, harte Liste aller Keywords, die an Traffic verloren haben, absteigend sortiert nach dem Schmerz-Faktor (Clicks Loss).
-4.  **Low Hanging Fruits:** Schwellen-Keywords auf Position 11-15, sortiert nach aktuellen Impressionen. Mit ein paar internen Links oder leichten Content-Ergänzungen holst du dir hier den Traffic.
-5.  **Gewinner:** Wer SEO macht, will auch Erfolge sehen. Zeigt dir, welche Keywords massiv an Klicks gewonnen haben (inklusive Bubble-Chart zur Visualisierung).
-6.  **Alle Daten:** Der ultimative Daten-Dump mit allen neu errechneten KPIs (wie "Total Ranking-Veränderung", "Clicks Change" als kombinierte Gain/Loss-Metrik) und interaktiven **Filtern** (Cluster, Change-Type, Keyword-Suche). Ideal für tiefgehende Analysen.
+<!-- TODO: add a dashboard screenshot or GIF here, e.g. ![Dashboard](docs/screenshot.png) -->
 
 ---
 
-## ⚙️ So bekommst du die Daten aus der GSC
+## 🌟 Key Features
 
-Das Tool benötigt exakt **eine** Datei:
-1. Öffne die **Google Search Console** deiner Domain.
-2. Gehe auf **Leistung -> Suchergebnisse**.
-3. Klicke oben auf den **Datumsfilter** und wähle den Reiter **Vergleichen** (z.B. "Letzte 28 Tage mit vorherigem Zeitraum vergleichen").
-4. Klicke auf **Anwenden**.
-5. Klicke oben rechts auf den **Exportieren** Button und wähle **CSV herunterladen**.
-6. Entpacke die heruntergeladene ZIP-Datei. Du findest darin eine Datei namens `Queries.csv`.
-7. Lade exakt diese `Queries.csv` in die Streamlit-App hoch.
+- **🌐 Language- & format-independent (positional parsing):** It doesn't matter whether your GSC exports in German (`Häufigste Suchanfragen`) or English (`Top queries`), or whether decimals use a comma or a dot. The app detects encoding and separator automatically and reads each column by its fixed GSC position — never by header name.
+- **🇬🇧🇩🇪 Bilingual UI:** Switch the entire dashboard between English and German with one click in the sidebar.
+- **🧩 Local, dependency-light keyword clustering:** Groups thousands of keywords into topic clusters in milliseconds using frequency-based head-term matching (word counts minus stopwords). **No ML model, no external API, no cost** — and it runs entirely on your machine. Includes a best/worst-cluster heatmap.
+- **🎯 Precise change tagging:** Beyond simple differences, every keyword is tagged against hard ranking thresholds — `New`, `OoTop3`, `OoTop10`, `OoSERP2`, `OoTop100`, `IntoTop10`. Micro-movements (< 1.0 position) are cleanly separated as `None`, everything else as `Changed`.
+- **🍎 Low Hanging Fruits:** Surfaces "threshold" keywords ranking on the top of page 2 (positions 11–15) that already generate real impressions — the fastest quick wins in SEO.
+- **📊 Interactive dashboard:** An at-a-glance KPI matrix (total losses, net change, Top 3 & Top 10 drops, per-cluster performance) plus six interactive analysis tabs.
 
 ---
 
-## 🚀 Installation & Lokaler Start
+## 📑 The Six Analysis Tabs
 
-Dieses Tool nutzt `streamlit` für das UI, `pandas` für die Datenverarbeitung und `plotly` für die Grafiken. Wir empfehlen die Nutzung des blitzschnellen Python-Managers `uv`.
+Once you upload your `Queries.csv`, the app generates six interactive tabs:
 
-**1. Repository klonen / Ordner öffnen**
-Navigiere in deinem Terminal in den Projektordner.
+1. **Topic Clusters** — Bundles click losses by head term, so you can instantly see if a whole topic (e.g. "winter tires" or "credit card") dropped collectively. Filter out brand keywords into a dedicated cluster.
+2. **Ranking Drops** — Sorts drops into prioritized buckets:
+   - **Top 3 Drops** — fell out of positions 1–3 (the painful ones).
+   - **Top 10 Drops** — dropped off page 1.
+   - **Page 2 Drops** — slid further back from page 2.
+   - **Complete Losses** — fell out of the Top 100 entirely.
+3. **Click Losses (Detail)** — The raw, hard list of every keyword that lost traffic, sorted by clicks lost.
+4. **Low Hanging Fruits** — Threshold keywords on positions 11–15, sorted by current impressions. A few internal links or small content tweaks can push these onto page 1.
+5. **Winners** — Keywords that gained clicks, with a bubble chart to visualize the wins.
+6. **All Data** — The full export with every computed KPI (combined gain/loss metrics, position change, etc.) and interactive filters (cluster, change type, keyword search).
 
-**2. App starten (mit uv)**
-Mit `uv` brauchst du keine manuellen virtuellen Umgebungen anlegen. Es installiert die Requirements on the fly und startet den Server in einer isolierten Umgebung:
+---
+
+## ⚙️ How to Get the Data from GSC
+
+The tool needs exactly **one** file:
+
+1. Open **Google Search Console** for your domain.
+2. Go to **Performance → Search results**.
+3. Click the **date filter** at the top and choose the **Compare** tab (e.g. "Compare last 28 days to previous period").
+4. Click **Apply**.
+5. Click **Export** (top right) and choose **Download CSV**.
+6. Unzip the downloaded file — inside you'll find `Queries.csv`.
+7. Upload exactly that `Queries.csv` into the app.
+
+---
+
+## 🚀 Run It Locally
+
+The app uses `streamlit` for the UI, `pandas` for data processing, and `plotly` for the charts. The quickest way to run it is with [`uv`](https://github.com/astral-sh/uv):
 
 ```bash
 uv run --python 3.12 --with-requirements requirements.txt streamlit run app.py
 ```
 
-Das Terminal gibt dir nun eine lokale URL (meist `http://localhost:8501`). Öffne diese in deinem Browser.
+`uv` installs the requirements on the fly in an isolated environment — no manual virtualenv needed. The terminal will print a local URL (usually `http://localhost:8501`); open it in your browser.
+
+<details>
+<summary>Prefer pip / a manual virtualenv?</summary>
+
+```bash
+python -m venv .venv
+source .venv/bin/activate      # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+streamlit run app.py
+```
+</details>
 
 ---
 
-## ☁️ Deployment auf der Streamlit Community Cloud
+## ☁️ Deploy to Streamlit Community Cloud
 
-Das Projekt ist "Cloud Ready" und kann in wenigen Klicks kostenlos gehostet werden:
-1. Pushe diesen Ordner (`app.py` und `requirements.txt`) in ein GitHub-Repository.
-2. Melde dich auf [share.streamlit.io](https://share.streamlit.io) mit deinem GitHub-Account an.
-3. Klicke auf **New app**, wähle das frisch erstellte Repo und wähle die `app.py` als Main File.
-4. Klicke auf **Deploy**. Fertig!
+The project is cloud-ready and can be hosted for free in a few clicks:
+
+1. Push this repo (`app.py` and `requirements.txt`) to GitHub.
+2. Sign in at [share.streamlit.io](https://share.streamlit.io) with your GitHub account.
+3. Click **New app**, select this repo, and set `app.py` as the main file.
+4. Click **Deploy**. Done.
 
 ---
 
-## 📝 Lizenz & Credits
+## 🔒 Privacy
 
-MIT License © 2026 Benjamin "SEOux Indianer" Wingerter 
-Made with ❤️ in Munich & Bangkok: [seouxindianer.de](https://seouxindianer.de)
+All processing happens locally (or in your own Streamlit instance). Your `Queries.csv` is never sent to a third-party API — there are no external calls in the analysis pipeline.
+
+---
+
+## 📝 License & Credits
+
+MIT License © 2026 Benjamin "SEOux Indianer" Wingerter
+Made with ❤️ in Munich & Bangkok — [seouxindianer.de](https://seouxindianer.de)
