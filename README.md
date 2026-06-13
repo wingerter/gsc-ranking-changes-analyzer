@@ -11,7 +11,7 @@ A fast, local SEO dashboard for analyzing ranking and traffic changes from Googl
 
 **👉 Try it now — no install needed: [gsc-ranking-changes-analyzer.streamlit.app](https://gsc-ranking-changes-analyzer.streamlit.app/)**
 
-<!-- TODO: add a dashboard screenshot or GIF here, e.g. ![Dashboard](docs/screenshot.png) -->
+![GSC Ranking Changes Analyzer dashboard](dasbhoard-20260613.png)
 
 ---
 
