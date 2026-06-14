@@ -188,13 +188,16 @@ def style_plotly_fig(fig):
         title_font_family="Raleway",
         title_font_color="#232323",
         title_font_size=15,
+        margin=dict(l=60, r=40, t=45, b=45),  # Safe default margins to avoid clipping
         xaxis=dict(
+            title="",  # Suppress default x-axis title to avoid "undefined" text
             gridcolor="#dfdfdf",
             zerolinecolor="#dfdfdf",
             linecolor="#dfdfdf",
             tickfont=dict(family="Open Sans", color="#535353")
         ),
         yaxis=dict(
+            title="",  # Suppress default y-axis title to avoid "undefined" text
             gridcolor="#dfdfdf",
             zerolinecolor="#dfdfdf",
             linecolor="#dfdfdf",
@@ -256,6 +259,9 @@ if uploaded_file is not None and st.session_state['analyzed']:
     st.success(t["succ_load"])
     
     # --- Data Cleaning ---
+    df = df.dropna(subset=['Keyword'])
+    df = df[df['Keyword'].astype(str).str.strip() != ""]
+    
     for col in df.columns[1:]:
         if df[col].dtype == 'object':
             df[col] = df[col].astype(str).str.replace('%', '', regex=False).str.replace(',', '.', regex=False)
@@ -399,8 +405,8 @@ if uploaded_file is not None and st.session_state['analyzed']:
                 color='Clicks Change', color_continuous_scale=[[0.0, '#d28063'], [0.5, '#ffed00'], [1.0, '#90c274']],
                 height=200
             )
-            fig_net.update_layout(margin=dict(l=0, r=0, t=0, b=0), yaxis_title=None, xaxis_title=None)
             style_plotly_fig(fig_net)
+            fig_net.update_layout(margin=dict(l=10, r=10, t=25, b=10))
             st.plotly_chart(fig_net, use_container_width=True)
 
     with viz_col2:
@@ -411,8 +417,8 @@ if uploaded_file is not None and st.session_state['analyzed']:
                 worst_top3, x='Clicks Loss', y='Keyword', orientation='h',
                 color_discrete_sequence=['#d28063'], height=270
             )
-            fig_t3.update_layout(margin=dict(l=0, r=0, t=10, b=0), yaxis_title=None, xaxis_title=None)
             style_plotly_fig(fig_t3)
+            fig_t3.update_layout(margin=dict(l=10, r=10, t=25, b=10))
             st.plotly_chart(fig_t3, use_container_width=True)
         else:
             st.info(t["rd_t3_empty"])
