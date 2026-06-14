@@ -386,11 +386,22 @@ if uploaded_file is not None and st.session_state['analyzed']:
     net_clicks = total_clicks_gained - total_clicks_lost
     lhf_impressions = int(low_hanging['Impressions_New'].sum())
     
+    # Calculate percentage change for the delta of Net Click Change
+    total_clicks_old = df['Clicks_Old'].sum()
+    pct_change = (net_clicks / total_clicks_old * 100) if total_clicks_old > 0 else 0.0
+    pct_sign = " %" if lang == "DE" else "%"
+    if net_clicks > 0:
+        pct_change_formatted = f"+{format_num(pct_change, decimal_places=1)}{pct_sign}"
+    elif net_clicks < 0:
+        pct_change_formatted = f"{format_num(pct_change, decimal_places=1)}{pct_sign}"
+    else:
+        pct_change_formatted = f"{format_num(0.0, decimal_places=1)}{pct_sign}"
+        
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric(t["kpi_lost_total"], f"-{format_num(total_clicks_lost)}")
     with col2:
-        st.metric(t["kpi_net_change"], f"+{format_num(net_clicks)}" if net_clicks > 0 else format_num(net_clicks), delta=net_clicks)
+        st.metric(t["kpi_net_change"], f"+{format_num(net_clicks)}" if net_clicks > 0 else format_num(net_clicks), delta=pct_change_formatted)
     with col3:
         st.metric(t["kpi_gained_total"], f"+{format_num(total_clicks_gained)}")
         
@@ -418,11 +429,17 @@ if uploaded_file is not None and st.session_state['analyzed']:
             best_cluster = cluster_net.loc[cluster_net['Clicks Change'].idxmax()]
             worst_cluster = cluster_net.loc[cluster_net['Clicks Change'].idxmin()]
             
+            best_val = best_cluster['Clicks Change']
+            best_delta = f"+{format_num(best_val)} {t['clicks']}" if best_val > 0 else f"{format_num(best_val)} {t['clicks']}"
+            
+            worst_val = worst_cluster['Clicks Change']
+            worst_delta = f"+{format_num(worst_val)} {t['clicks']}" if worst_val > 0 else f"{format_num(worst_val)} {t['clicks']}"
+            
             c1, c2 = st.columns(2)
             with c1:
-                st.metric(t["kpi_best_cluster"], best_cluster['Cluster'], f"{format_num(best_cluster['Clicks Change'])} {t['clicks']}")
+                st.metric(t["kpi_best_cluster"], best_cluster['Cluster'], best_delta)
             with c2:
-                st.metric(t["kpi_worst_cluster"], worst_cluster['Cluster'], f"{format_num(worst_cluster['Clicks Change'])} {t['clicks']}")
+                st.metric(t["kpi_worst_cluster"], worst_cluster['Cluster'], worst_delta)
                 
             top_bottom = pd.concat([cluster_net.nlargest(3, 'Clicks Change'), cluster_net.nsmallest(3, 'Clicks Change')]).drop_duplicates()
             top_bottom = top_bottom.sort_values('Clicks Change')
