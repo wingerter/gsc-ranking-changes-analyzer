@@ -32,3 +32,6 @@ Thumbs.db
 
 # Env files
 .env
+
+# Temporary design resources
+_TEMP/

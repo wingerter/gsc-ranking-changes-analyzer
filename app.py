@@ -8,9 +8,17 @@ from collections import Counter
 
 st.set_page_config(page_title="GSC Ranking Changes Analyzer", layout="wide")
 
+# --- Load Brand Styles ---
+try:
+    with open("brand_style.css", "r", encoding="utf-8") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+except Exception as e:
+    st.warning(f"Konnte brand_style.css nicht laden: {e}")
+
 # --- i18n Language Setup ---
-st.sidebar.markdown("### 🌐 Language / Sprache")
-lang_choice = st.sidebar.radio("Select Language", options=["🇬🇧 EN", "🇩🇪 DE"], label_visibility="collapsed")
+st.sidebar.image("assets/logo-horizontal.png", use_container_width=True)
+st.sidebar.markdown("### Language / Sprache")
+lang_choice = st.sidebar.radio("Select Language", options=["EN", "DE"], label_visibility="collapsed")
 lang = "EN" if "EN" in lang_choice else "DE"
 
 translations = {
@@ -54,7 +62,7 @@ translations = {
         "cl_other": "Other",
         
         "rd_sub": "Ranking Drops Overview",
-        "rd_filter": "🔍 Filter by keyword (optional):",
+        "rd_filter": "Filter by keyword (optional):",
         "rd_t3_title": "#### 1. Top 3 Drops (Fell out of Top 3)",
         "rd_t3_empty": "No Top 3 Drops found.",
         "rd_t10_title": "#### 2. Top 10 Drops (Fell out of Top 10)",
@@ -83,28 +91,27 @@ translations = {
         "ad_filter_kw": "Search Keyword",
         "kpi_cluster_title": "Topic Cluster Performance",
         "kpi_best_cluster": "Best Cluster",
-        "kpi_best_cluster": "Best Cluster",
         "kpi_worst_cluster": "Worst Cluster",
         "kpi_top3_drops": "Top 3 Drops",
         "kpi_lhf": "Low Hanging Fruits",
-        "kpi_lhf_link": "👉 See tab below",
+        "kpi_lhf_link": "See tab below",
         "kpi_lhf_help": "Actual impressions generated in the current timeframe by keywords ranking on positions 11-15. High impressions here mean great potential if pushed to page 1.",
         "kpi_top3_title": "Top 3 Drops (Worst 5)",
     },
     "DE": {
         "title": "GSC Ranking Changes Analyzer",
-        "subtitle": "Lade deinen Google Search Console Vergleichsexport (Queries.csv) hoch und analysiere reale Klick-Verluste und Quick Wins.",
+        "subtitle": "Laden Sie Ihren Google Search Console Vergleichsexport (Queries.csv) hoch und analysieren Sie reale Klick-Verluste und Quick-Wins.",
         "sidebar_data": "1. Daten & Einstellungen",
         "upload_label": "GSC Queries.csv Upload",
-        "cluster_settings": "Clustering Einstellungen",
+        "cluster_settings": "Clustering-Einstellungen",
         "brand_input": "Brand-Keywords (kommagetrennt)",
         "brand_help": "Keywords, die diese Begriffe enthalten, werden in einem eigenen 'Brand' Cluster gesammelt.",
         "cluster_count": "Anzahl der Themen-Cluster",
         "btn_analyze": "Analysieren",
-        "err_format": "Konnte das GSC-Format nicht erkennen. Bitte lade eine standardmäßige Queries.csv aus einem GSC-Zeitraumvergleich hoch (genau 9 Spalten erwartet).",
+        "err_format": "Das GSC-Format konnte nicht erkannt werden. Bitte laden Sie eine standardmäßige Queries.csv aus einem GSC-Zeitraumvergleich hoch (genau 9 Spalten erwartet).",
         "err_read": "Fehler beim Lesen der CSV: ",
         "succ_load": "GSC-Datei erfolgreich geladen und Spalten erkannt!",
-        "info_upload": "Bitte lade eine GSC Queries.csv Datei hoch und klicke auf 'Analysieren'.",
+        "info_upload": "Bitte laden Sie eine GSC Queries.csv Datei hoch und klicken Sie auf 'Analysieren'.",
         
         "kpi_header": "Überblick: Echte GSC-Klicks",
         "kpi_lost_total": "Verlorene Klicks (Gesamt)",
@@ -125,13 +132,13 @@ translations = {
         "cl_chart_label_c": "Themen-Cluster",
         "cl_chart_label_v": "Verlorene Klicks",
         "cl_detail": "#### Detail-Daten pro Cluster",
-        "cl_select": "Wähle ein oder mehrere Cluster für Detail-Insights:",
+        "cl_select": "Wählen Sie ein oder mehrere Cluster für Detail-Insights:",
         "cl_sum": "Gesamte verlorene Klicks in den gewählten Clustern:",
         "cl_empty": "Keine Klick-Verluste vorhanden.",
         "cl_other": "Sonstiges",
         
         "rd_sub": "Ranking Drops Übersicht",
-        "rd_filter": "🔍 Nach Keyword filtern (optional):",
+        "rd_filter": "Nach Keyword filtern (optional):",
         "rd_t3_title": "#### 1. Top 3 Drops (Aus Top 3 gerutscht)",
         "rd_t3_empty": "Keine Top 3 Drops gefunden.",
         "rd_t10_title": "#### 2. Top 10 Drops (Aus Top 10 gerutscht)",
@@ -145,7 +152,7 @@ translations = {
         "cd_sub": "Größte absolute Klick-Verluste (Alle)",
         
         "lhf_sub": "Low Hanging Fruits (Position 11 - 15)",
-        "lhf_desc": "Diese sogenannten **Schwellen-Keywords** ranken aktuell auf der oberen Hälfte von Seite 2 (Position 11-15) und generieren dort bereits die gezeigten, echten Impressionen. Das bedeutet: Das Suchvolumen ist da! Mit winzigen inhaltlichen Optimierungen kannst du diese Keywords über die Schwelle auf Seite 1 schieben und die Impressionen in massiven Traffic verwandeln.",
+        "lhf_desc": "Diese sogenannten **Schwellen-Keywords** ranken aktuell auf der oberen Hälfte von Seite 2 (Position 11-15) und generieren dort bereits die gezeigten, echten Impressionen. Das bedeutet: Das Suchvolumen ist vorhanden. Mit geringen On-Page-Optimierungen können Sie diese Keywords über die Schwelle auf Seite 1 schieben und die Impressionen in signifikanten Traffic verwandeln.",
         "lhf_empty": "Keine Keywords im Bereich 11-15 gefunden.",
         
         "win_sub": "Gewinner (Klick-Zuwachs)",
@@ -160,17 +167,41 @@ translations = {
         "ad_filter_kw": "Keyword suchen",
         "kpi_cluster_title": "Themen-Cluster Performance",
         "kpi_best_cluster": "Bestes Cluster",
-        "kpi_best_cluster": "Bestes Cluster",
         "kpi_worst_cluster": "Schlechtestes Cluster",
         "kpi_top3_drops": "Top 3 Abstürze",
         "kpi_lhf": "Low Hanging Fruits",
-        "kpi_lhf_link": "👉 Siehe Reiter unten",
+        "kpi_lhf_link": "Siehe Reiter unten",
         "kpi_lhf_help": "Echte Impressionen, die diese Keywords im aktuellen Zeitraum auf den Positionen 11-15 gesammelt haben. Viele Impressionen hier bedeuten hohes Potenzial für Seite 1.",
         "kpi_top3_title": "Top 3 Abstürze (Die 5 schlimmsten)",
     }
 }
 
 t = translations[lang]
+
+# Helper to style Plotly figures according to Corporate Design
+def style_plotly_fig(fig):
+    fig.update_layout(
+        paper_bgcolor="#ffffff",
+        plot_bgcolor="#ffffff",
+        font_family="Raleway",
+        font_color="#232323",
+        title_font_family="Raleway",
+        title_font_color="#232323",
+        title_font_size=15,
+        xaxis=dict(
+            gridcolor="#dfdfdf",
+            zerolinecolor="#dfdfdf",
+            linecolor="#dfdfdf",
+            tickfont=dict(family="Open Sans", color="#535353")
+        ),
+        yaxis=dict(
+            gridcolor="#dfdfdf",
+            zerolinecolor="#dfdfdf",
+            linecolor="#dfdfdf",
+            tickfont=dict(family="Open Sans", color="#535353")
+        )
+    )
+    return fig
 
 st.title(t["title"])
 st.markdown(t["subtitle"])
@@ -304,7 +335,7 @@ if uploaded_file is not None and st.session_state['analyzed']:
     df['Cluster'] = df['Keyword'].apply(get_cluster)
     df.loc[df['Cluster'].isnull(), 'Cluster'] = df[df['Cluster'].isnull()]['Keyword'].apply(assign_head_term)
 
-    st.write("---")
+    st.markdown("<hr class='hr--grey'>", unsafe_allow_html=True)
     
     # Segments
     losers = df[df['Clicks Loss'] > 0].copy()
@@ -340,9 +371,9 @@ if uploaded_file is not None and st.session_state['analyzed']:
         st.metric(t["kpi_top10_drops"], len(top10_drops), delta=f"-{int(top10_drops['Clicks Loss'].sum())} {t['clicks']}", delta_color="normal")
     with col6:
         st.metric(t["kpi_lhf"], len(low_hanging), delta=f"{lhf_impressions:,} Imp.".replace(',', '.'), delta_color="off", help=t["kpi_lhf_help"])
-        st.markdown(f"<div style='font-size: 14px; color: gray;'>{t.get('kpi_lhf_link', '👉 Siehe Reiter unten')}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='font-size: 14px; color: gray;'>{t.get('kpi_lhf_link', 'Siehe Reiter unten')}</div>", unsafe_allow_html=True)
         
-    st.write("---")
+    st.markdown("<hr class='hr--grey'>", unsafe_allow_html=True)
     
     viz_col1, viz_col2 = st.columns(2)
     
@@ -365,10 +396,11 @@ if uploaded_file is not None and st.session_state['analyzed']:
             top_bottom = top_bottom.sort_values('Clicks Change')
             fig_net = px.bar(
                 top_bottom, x='Clicks Change', y='Cluster', orientation='h',
-                color='Clicks Change', color_continuous_scale='RdYlGn',
+                color='Clicks Change', color_continuous_scale=[[0.0, '#d28063'], [0.5, '#ffed00'], [1.0, '#90c274']],
                 height=200
             )
             fig_net.update_layout(margin=dict(l=0, r=0, t=0, b=0), yaxis_title=None, xaxis_title=None)
+            style_plotly_fig(fig_net)
             st.plotly_chart(fig_net, use_container_width=True)
 
     with viz_col2:
@@ -377,14 +409,15 @@ if uploaded_file is not None and st.session_state['analyzed']:
             worst_top3 = top3_drops.nlargest(5, 'Clicks Loss').sort_values('Clicks Loss', ascending=True)
             fig_t3 = px.bar(
                 worst_top3, x='Clicks Loss', y='Keyword', orientation='h',
-                color_discrete_sequence=['#ff4b4b'], height=270
+                color_discrete_sequence=['#d28063'], height=270
             )
             fig_t3.update_layout(margin=dict(l=0, r=0, t=10, b=0), yaxis_title=None, xaxis_title=None)
+            style_plotly_fig(fig_t3)
             st.plotly_chart(fig_t3, use_container_width=True)
         else:
             st.info(t["rd_t3_empty"])
             
-    st.write("---")
+    st.markdown("<hr class='hr--grey'>", unsafe_allow_html=True)
 
     def display_styled_dataframe(df_to_show, sort_col, ascending=False):
         loss_cols = [c for c in ['Clicks Loss'] if c in df_to_show.columns]
@@ -394,12 +427,12 @@ if uploaded_file is not None and st.session_state['analyzed']:
         format_dict = {}
         
         if loss_cols:
-            styler = styler.map(lambda x: 'color: #ff4b4b; font-weight: bold;' if pd.notnull(x) and x > 0 else '', subset=loss_cols)
+            styler = styler.map(lambda x: 'color: #d28063; font-weight: bold;' if pd.notnull(x) and x > 0 else '', subset=loss_cols)
             for c in loss_cols:
                 format_dict[c] = lambda x: f"▼ -{int(x):,}".replace(',', '.') if pd.notnull(x) and x > 0 else ("0" if pd.notnull(x) else "")
                 
         if gain_cols:
-            styler = styler.map(lambda x: 'color: #09ab3b; font-weight: bold;' if pd.notnull(x) and x > 0 else '', subset=gain_cols)
+            styler = styler.map(lambda x: 'color: #90c274; font-weight: bold;' if pd.notnull(x) and x > 0 else '', subset=gain_cols)
             for c in gain_cols:
                 format_dict[c] = lambda x: f"▲ +{int(x):,}".replace(',', '.') if pd.notnull(x) and x > 0 else ("0" if pd.notnull(x) else "")
                 
@@ -417,8 +450,8 @@ if uploaded_file is not None and st.session_state['analyzed']:
         if 'Position Change' in df_to_show.columns:
             def style_pos_change(x):
                 if pd.isnull(x) or abs(x) > 90: return ''
-                if x > 0: return 'color: #09ab3b; font-weight: bold;'
-                if x < 0: return 'color: #ff4b4b; font-weight: bold;'
+                if x > 0: return 'color: #90c274; font-weight: bold;'
+                if x < 0: return 'color: #d28063; font-weight: bold;'
                 return ''
             styler = styler.map(style_pos_change, subset=['Position Change'])
             
@@ -434,8 +467,8 @@ if uploaded_file is not None and st.session_state['analyzed']:
         if 'Clicks Change' in df_to_show.columns:
             def style_clicks_change(x):
                 if pd.isnull(x) or x == 0: return ''
-                if x > 0: return 'color: #09ab3b; font-weight: bold;'
-                if x < 0: return 'color: #ff4b4b; font-weight: bold;'
+                if x > 0: return 'color: #90c274; font-weight: bold;'
+                if x < 0: return 'color: #d28063; font-weight: bold;'
                 return ''
             styler = styler.map(style_clicks_change, subset=['Clicks Change'])
             
@@ -478,7 +511,8 @@ if uploaded_file is not None and st.session_state['analyzed']:
                          title=t["cl_chart_title"],
                          labels={'Cluster': t["cl_chart_label_c"], 'Clicks_Loss': t["cl_chart_label_v"]},
                          hover_data=['Keyword_Count'],
-                         color='Clicks_Loss', color_continuous_scale='Oranges')
+                         color='Clicks_Loss', color_continuous_scale=[[0.0, '#dfdfdf'], [1.0, '#d28063']])
+            style_plotly_fig(fig_cluster)
             st.plotly_chart(fig_cluster, use_container_width=True)
             
             st.markdown(t["cl_detail"])
@@ -548,9 +582,11 @@ if uploaded_file is not None and st.session_state['analyzed']:
                 winners, x="Clicks Gain", y="Position_New", 
                 size="Clicks_New", color="Position Change",
                 hover_name="Keyword", title=t["win_chart_title"],
-                labels={'Position_New': t["win_chart_label_pos"], 'Clicks Gain': t["win_chart_label_gain"]}
+                labels={'Position_New': t["win_chart_label_pos"], 'Clicks Gain': t["win_chart_label_gain"]},
+                color_continuous_scale=[[0.0, '#dfdfdf'], [1.0, '#90c274']]
             )
             fig_win.update_yaxes(autorange="reversed")
+            style_plotly_fig(fig_win)
             st.plotly_chart(fig_win, use_container_width=True)
         else:
             st.info(t["win_empty"])
@@ -583,10 +619,10 @@ else:
     st.info(translations[lang]["info_upload"])
 
 # Footer
-st.markdown("<br><hr>", unsafe_allow_html=True)
+st.markdown("<hr class='hr--grey'>", unsafe_allow_html=True)
 st.markdown(
-    "<div style='text-align: center; color: gray; font-size: 0.9em;'>"
-    "MIT License &copy; 2026 Benjamin &quot;SEOux Indianer&quot; Wingerter | Made with ❤️ in Munich & Bangkok: <a href='https://seouxindianer.de' target='_blank' style='color: gray; text-decoration: underline;'>seouxindianer.de</a>"
+    "<div style='text-align: center; color: #797979; font-size: 0.9em;'>"
+    "MIT License &copy; 2026 Benjamin &quot;SEOux Indianer&quot; Wingerter | Erstellt in München & Bangkok | <a href='https://seouxindianer.de' target='_blank' style='color: #2ea3f2; text-decoration: underline;'>seouxindianer.de</a>"
     "</div>", 
     unsafe_allow_html=True
 )
