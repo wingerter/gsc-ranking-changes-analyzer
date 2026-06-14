@@ -216,14 +216,14 @@ def style_plotly_fig(fig):
             font=dict(family="Raleway", color="#232323", size=15)
         ),
         xaxis=dict(
-            title="",  # Suppress default x-axis title to avoid "undefined" text
+            title=dict(text=""),  # Suppress default x-axis title to avoid "undefined" text
             gridcolor="#dfdfdf",
             zerolinecolor="#dfdfdf",
             linecolor="#dfdfdf",
             tickfont=dict(family="Open Sans", color="#535353")
         ),
         yaxis=dict(
-            title="",  # Suppress default y-axis title to avoid "undefined" text
+            title=dict(text=""),  # Suppress default y-axis title to avoid "undefined" text
             gridcolor="#dfdfdf",
             zerolinecolor="#dfdfdf",
             linecolor="#dfdfdf",
