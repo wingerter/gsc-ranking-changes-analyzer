@@ -102,6 +102,38 @@ translations = {
         "kpi_lhf_help": "Actual impressions generated in the current timeframe by keywords ranking on positions 11-15. High impressions here mean great potential if pushed to page 1.",
         "kpi_top3_title": "Top 3 Drops (Worst 5)",
         "footer": "MIT License &copy; 2026 Benjamin &quot;SEOux Indianer&quot; Wingerter | Created in Munich & Bangkok with ❤️ | <a href='https://seouxindianer.de' target='_blank' style='color: #2ea3f2; text-decoration: underline;'>seouxindianer.de</a>",
+        "legal_header": "Legal & Privacy Policy",
+        "imprint_body": """### Imprint
+
+**Information pursuant to § 5 DDG:**
+Benjamin Wingerter
+SEOux Indianer
+Email: mytools.gscrankingchanges@mindblowmedia.com
+Website: seouxindianer.de
+
+**Disclaimer:**
+The contents of this app were created with the utmost care. However, we cannot guarantee the correctness, completeness, or topicality of the content.""",
+        "privacy_body": """### Privacy Policy
+
+**1. General Information**
+This privacy policy informs you about the nature, scope, and purpose of the processing of personal data within this web application.
+
+**2. Data Controller**
+Benjamin Wingerter
+Email: mytools.gscrankingchanges@mindblowmedia.com
+
+**3. Hosting (Streamlit Cloud)**
+This app is hosted on Streamlit Community Cloud, a service provided by Snowflake Inc. (106 East Babcock Street, Suite 3A, Bozeman, MT 59715, USA). To serve the app securely, Snowflake processes connection logs and IP addresses of visitors. This processing is based on our legitimate interest in a secure and efficient operation of the application (Art. 6 (1) (f) GDPR). For more details, please refer to the Snowflake Privacy Policy.
+
+**4. Processing of Uploaded Files (CSV)**
+When you upload a Google Search Console export file (Queries.csv):
+- The file is processed **exclusively in the transient memory (RAM)** of the server to generate dashboards.
+- The uploaded data is **never stored permanently on any storage drive or database**.
+- As soon as you terminate your session (e.g., by closing the browser tab, reloading the page, or replacing the file), all processed data is completely erased.
+- The legal basis for this processing is Art. 6 (1) (f) GDPR (our legitimate interest in providing you with this analysis tool).
+
+**5. Your Rights**
+You have the right to access, rectify, erase, or restrict the processing of your personal data, as well as the right to data portability and objection.""",
     },
     "DE": {
         "title": "GSC Ranking Changes Analyzer",
@@ -179,6 +211,38 @@ translations = {
         "kpi_lhf_help": "Echte Impressionen, die diese Keywords im aktuellen Zeitraum auf den Positionen 11-15 gesammelt haben. Viele Impressionen hier bedeuten hohes Potenzial für Seite 1.",
         "kpi_top3_title": "Top 3 Abstürze (Die 5 schlimmsten)",
         "footer": "MIT License &copy; 2026 Benjamin &quot;SEOux Indianer&quot; Wingerter | Erstellt in München & Bangkok mit ❤️ | <a href='https://seouxindianer.de' target='_blank' style='color: #2ea3f2; text-decoration: underline;'>seouxindianer.de</a>",
+        "legal_header": "Rechtliches / Impressum",
+        "imprint_body": """### Impressum
+
+**Angaben gemäß § 5 DDG:**
+Benjamin Wingerter
+SEOux Indianer
+E-Mail: mytools.gscrankingchanges@mindblowmedia.com
+Website: seouxindianer.de
+
+**Haftungsausschluss (Disclaimer):**
+Die Inhalte dieser App wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen.""",
+        "privacy_body": """### Datenschutzerklärung
+
+**1. Allgemeine Hinweise**
+Diese Datenschutzerklärung klärt Sie über die Art, den Umfang und Zweck der Verarbeitung von personenbezogenen Daten innerhalb dieser Webanwendung (App) auf.
+
+**2. Verantwortlicher**
+Benjamin Wingerter
+E-Mail: mytools.gscrankingchanges@mindblowmedia.com
+
+**3. Hosting (Streamlit Cloud)**
+Diese App wird auf der Streamlit Community Cloud gehostet, einem Dienst von Snowflake Inc. (106 East Babcock Street, Suite 3A, Bozeman, MT 59715, USA). Zur Bereitstellung und zum sicheren Betrieb der App verarbeitet Snowflake Verbindungsdaten und IP-Adressen der Besucher. Die Übermittlung erfolgt auf Grundlage unserer berechtigten Interessen an einem sicheren und effizienten Betrieb des Dienstes (Art. 6 Abs. 1 lit. f DSGVO). Weitere Details finden Sie in der Datenschutzerklärung von Snowflake.
+
+**4. Verarbeitung von hochgeladenen Dateien (CSV)**
+Wenn Sie eine Google Search Console Exportdatei (Queries.csv) hochladen:
+- Die Datei wird **ausschließlich im Arbeitsspeicher (RAM)** des Servers verarbeitet, um die Auswertungen zu berechnen.
+- Die hochgeladenen Daten werden **zu keinem Zeitpunkt dauerhaft auf Datenträgern oder in einer DBA gespeichert**.
+- Sobald Sie Ihre Sitzung beenden (z. B. durch Schließen des Browsers, Neuladen der Seite oder Ändern der Upload-Datei), werden die verarbeiteten Daten vollständig gelöscht.
+- Die Rechtsgrundlage für diese Verarbeitung ist Art. 6 Abs. 1 lit. f DSGVO (unser berechtigtes Interesse, Ihnen diese Analysefunktionalität anzubieten).
+
+**5. Ihre Rechte**
+Sie haben das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung Ihrer personenbezogenen Daten sowie das Recht auf Datenübertragbarkeit und Widerspruch.""",
     }
 }
 
@@ -249,6 +313,13 @@ if 'analyzed' not in st.session_state:
 if uploaded_file is not None:
     if st.sidebar.button(t["btn_analyze"], type="primary"):
         st.session_state['analyzed'] = True
+
+# Sidebar - Legal Disclosures
+st.sidebar.markdown("---")
+with st.sidebar.expander(t["legal_header"]):
+    st.markdown(t["imprint_body"])
+    st.markdown("---")
+    st.markdown(t["privacy_body"])
 
 if uploaded_file is not None and st.session_state['analyzed']:
     try:
