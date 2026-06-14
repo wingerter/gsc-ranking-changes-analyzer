@@ -6,7 +6,11 @@ import io
 import re
 from collections import Counter
 
-st.set_page_config(page_title="GSC Ranking Changes Analyzer", layout="wide")
+st.set_page_config(
+    page_title="GSC Ranking Changes Analyzer",
+    page_icon="assets/logo-head-clear.png",
+    layout="wide"
+)
 
 # --- Load Brand Styles ---
 try:
@@ -97,6 +101,7 @@ translations = {
         "kpi_lhf_link": "See tab below",
         "kpi_lhf_help": "Actual impressions generated in the current timeframe by keywords ranking on positions 11-15. High impressions here mean great potential if pushed to page 1.",
         "kpi_top3_title": "Top 3 Drops (Worst 5)",
+        "footer": "MIT License &copy; 2026 Benjamin &quot;SEOux Indianer&quot; Wingerter | Created in Munich & Bangkok with ❤️ | <a href='https://seouxindianer.de' target='_blank' style='color: #2ea3f2; text-decoration: underline;'>seouxindianer.de</a>",
     },
     "DE": {
         "title": "GSC Ranking Changes Analyzer",
@@ -173,22 +178,43 @@ translations = {
         "kpi_lhf_link": "Siehe Reiter unten",
         "kpi_lhf_help": "Echte Impressionen, die diese Keywords im aktuellen Zeitraum auf den Positionen 11-15 gesammelt haben. Viele Impressionen hier bedeuten hohes Potenzial für Seite 1.",
         "kpi_top3_title": "Top 3 Abstürze (Die 5 schlimmsten)",
+        "footer": "MIT License &copy; 2026 Benjamin &quot;SEOux Indianer&quot; Wingerter | Erstellt in München & Bangkok mit ❤️ | <a href='https://seouxindianer.de' target='_blank' style='color: #2ea3f2; text-decoration: underline;'>seouxindianer.de</a>",
     }
 }
 
 t = translations[lang]
 
+# Helper to format numbers based on selected language (DE: 1.234.567,89 / EN: 1,234,567.89)
+def format_num(val, decimal_places=0):
+    if pd.isnull(val):
+        return ""
+    formatted_str = f"{val:,.{decimal_places}f}"
+    if lang == "DE":
+        placeholder = "|||"
+        temp = formatted_str.replace(",", placeholder)
+        temp = temp.replace(".", ",")
+        formatted_str = temp.replace(placeholder, ".")
+    return formatted_str
+
 # Helper to style Plotly figures according to Corporate Design
 def style_plotly_fig(fig):
+    title_text = ""
+    if fig.layout.title is not None:
+        if isinstance(fig.layout.title, str):
+            title_text = fig.layout.title
+        elif hasattr(fig.layout.title, 'text') and fig.layout.title.text is not None:
+            title_text = fig.layout.title.text
+
     fig.update_layout(
         paper_bgcolor="#ffffff",
         plot_bgcolor="#ffffff",
         font_family="Raleway",
         font_color="#232323",
-        title_font_family="Raleway",
-        title_font_color="#232323",
-        title_font_size=15,
         margin=dict(l=60, r=40, t=45, b=45),  # Safe default margins to avoid clipping
+        title=dict(
+            text=title_text,
+            font=dict(family="Raleway", color="#232323", size=15)
+        ),
         xaxis=dict(
             title="",  # Suppress default x-axis title to avoid "undefined" text
             gridcolor="#dfdfdf",
@@ -362,21 +388,21 @@ if uploaded_file is not None and st.session_state['analyzed']:
     
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric(t["kpi_lost_total"], f"-{total_clicks_lost:,}".replace(',', '.'))
+        st.metric(t["kpi_lost_total"], f"-{format_num(total_clicks_lost)}")
     with col2:
-        st.metric(t["kpi_net_change"], f"{net_clicks:,}".replace(',', '.'), delta=net_clicks)
+        st.metric(t["kpi_net_change"], f"+{format_num(net_clicks)}" if net_clicks > 0 else format_num(net_clicks), delta=net_clicks)
     with col3:
-        st.metric(t["kpi_gained_total"], f"+{total_clicks_gained:,}".replace(',', '.'))
+        st.metric(t["kpi_gained_total"], f"+{format_num(total_clicks_gained)}")
         
     st.write("")
     
     col4, col5, col6 = st.columns(3)
     with col4:
-        st.metric(t["kpi_top3_drops"], len(top3_drops), delta=f"-{int(top3_drops['Clicks Loss'].sum())} {t['clicks']}", delta_color="normal")
+        st.metric(t["kpi_top3_drops"], len(top3_drops), delta=f"-{format_num(int(top3_drops['Clicks Loss'].sum()))} {t['clicks']}", delta_color="normal")
     with col5:
-        st.metric(t["kpi_top10_drops"], len(top10_drops), delta=f"-{int(top10_drops['Clicks Loss'].sum())} {t['clicks']}", delta_color="normal")
+        st.metric(t["kpi_top10_drops"], len(top10_drops), delta=f"-{format_num(int(top10_drops['Clicks Loss'].sum()))} {t['clicks']}", delta_color="normal")
     with col6:
-        st.metric(t["kpi_lhf"], len(low_hanging), delta=f"{lhf_impressions:,} Imp.".replace(',', '.'), delta_color="off", help=t["kpi_lhf_help"])
+        st.metric(t["kpi_lhf"], len(low_hanging), delta=f"{format_num(lhf_impressions)} Imp.", delta_color="off", help=t["kpi_lhf_help"])
         st.markdown(f"<div style='font-size: 14px; color: gray;'>{t.get('kpi_lhf_link', 'Siehe Reiter unten')}</div>", unsafe_allow_html=True)
         
     st.markdown("<hr class='hr--grey'>", unsafe_allow_html=True)
@@ -394,9 +420,9 @@ if uploaded_file is not None and st.session_state['analyzed']:
             
             c1, c2 = st.columns(2)
             with c1:
-                st.metric(t["kpi_best_cluster"], best_cluster['Cluster'], f"{int(best_cluster['Clicks Change']):,} {t['clicks']}".replace(',', '.'))
+                st.metric(t["kpi_best_cluster"], best_cluster['Cluster'], f"{format_num(best_cluster['Clicks Change'])} {t['clicks']}")
             with c2:
-                st.metric(t["kpi_worst_cluster"], worst_cluster['Cluster'], f"{int(worst_cluster['Clicks Change']):,} {t['clicks']}".replace(',', '.'))
+                st.metric(t["kpi_worst_cluster"], worst_cluster['Cluster'], f"{format_num(worst_cluster['Clicks Change'])} {t['clicks']}")
                 
             top_bottom = pd.concat([cluster_net.nlargest(3, 'Clicks Change'), cluster_net.nsmallest(3, 'Clicks Change')]).drop_duplicates()
             top_bottom = top_bottom.sort_values('Clicks Change')
@@ -435,23 +461,20 @@ if uploaded_file is not None and st.session_state['analyzed']:
         if loss_cols:
             styler = styler.map(lambda x: 'color: #d28063; font-weight: bold;' if pd.notnull(x) and x > 0 else '', subset=loss_cols)
             for c in loss_cols:
-                format_dict[c] = lambda x: f"▼ -{int(x):,}".replace(',', '.') if pd.notnull(x) and x > 0 else ("0" if pd.notnull(x) else "")
+                format_dict[c] = lambda x: f"▼ -{format_num(x)}" if pd.notnull(x) and x > 0 else ("0" if pd.notnull(x) else "")
                 
         if gain_cols:
             styler = styler.map(lambda x: 'color: #90c274; font-weight: bold;' if pd.notnull(x) and x > 0 else '', subset=gain_cols)
             for c in gain_cols:
-                format_dict[c] = lambda x: f"▲ +{int(x):,}".replace(',', '.') if pd.notnull(x) and x > 0 else ("0" if pd.notnull(x) else "")
+                format_dict[c] = lambda x: f"▲ +{format_num(x)}" if pd.notnull(x) and x > 0 else ("0" if pd.notnull(x) else "")
                 
         for c in ['Clicks_New', 'Clicks_Old', 'Impressions_New', 'Impressions_Old']:
             if c in df_to_show.columns:
-                format_dict[c] = lambda x: f"{int(x):,}".replace(',', '.') if pd.notnull(x) else ""
+                format_dict[c] = lambda x: format_num(x) if pd.notnull(x) else ""
                 
         for c in ['Position_New', 'Position_Old']:
             if c in df_to_show.columns:
-                if lang == "DE":
-                    format_dict[c] = lambda x: f"{x:.2f}".replace('.', ',') if pd.notnull(x) and x != 101 else ("-" if x == 101 else "")
-                else:
-                    format_dict[c] = lambda x: f"{x:.2f}" if pd.notnull(x) and x != 101 else ("-" if x == 101 else "")
+                format_dict[c] = lambda x: format_num(x, decimal_places=2) if pd.notnull(x) and x != 101 else ("-" if x == 101 else "")
                 
         if 'Position Change' in df_to_show.columns:
             def style_pos_change(x):
@@ -463,10 +486,10 @@ if uploaded_file is not None and st.session_state['analyzed']:
             
             def format_pos_change(x):
                 if pd.isnull(x) or abs(x) > 90: return "-"
-                val = f"{x:.2f}"
+                val = format_num(abs(x), decimal_places=2)
                 if x > 0: val = f"▲ +{val}"
-                elif x < 0: val = f"▼ {val}"
-                return val.replace('.', ',') if lang == "DE" else val
+                elif x < 0: val = f"▼ -{val}"
+                return val
                 
             format_dict['Position Change'] = format_pos_change
             
@@ -480,10 +503,10 @@ if uploaded_file is not None and st.session_state['analyzed']:
             
             def format_clicks_change(x):
                 if pd.isnull(x) or x == 0: return "0"
-                val = f"{int(x):,}"
+                val = format_num(abs(x))
                 if x > 0: val = f"▲ +{val}"
-                elif x < 0: val = f"▼ {val}"
-                return val.replace(',', '.')
+                elif x < 0: val = f"▼ -{val}"
+                return val
                 
             format_dict['Clicks Change'] = format_clicks_change
             
@@ -525,7 +548,7 @@ if uploaded_file is not None and st.session_state['analyzed']:
             selected_clusters = st.multiselect(t["cl_select"], options=cluster_vol['Cluster'].tolist(), default=[cluster_vol['Cluster'].iloc[0]])
             if selected_clusters:
                 cluster_df = losers[losers['Cluster'].isin(selected_clusters)]
-                st.write(f"{t['cl_sum']} **{int(cluster_df['Clicks Loss'].sum()):,}**".replace(',', '.'))
+                st.write(f"{t['cl_sum']} **{format_num(cluster_df['Clicks Loss'].sum())}**")
                 display_styled_dataframe(cluster_df[['Keyword', 'Cluster', 'Position Change', 'Position_Old', 'Position_New', 'Clicks Loss', 'Clicks_Old', 'Clicks_New']], sort_col='Clicks Loss')
         else:
             st.info(t["cl_empty"])
@@ -541,28 +564,28 @@ if uploaded_file is not None and st.session_state['analyzed']:
         
         st.markdown(t["rd_t3_title"])
         if not f_top3.empty:
-            st.write(f"{t['rd_sum']} **{int(f_top3['Clicks Loss'].sum()):,}**".replace(',', '.'))
+            st.write(f"{t['rd_sum']} **{format_num(f_top3['Clicks Loss'].sum())}**")
             display_styled_dataframe(f_top3[['Keyword', 'Position Change', 'Position_Old', 'Position_New', 'Clicks Loss', 'Clicks_Old', 'Clicks_New']], sort_col='Clicks Loss')
         else:
             st.info(t["rd_t3_empty"])
             
         st.markdown(t["rd_t10_title"])
         if not f_top10.empty:
-            st.write(f"{t['rd_sum']} **{int(f_top10['Clicks Loss'].sum()):,}**".replace(',', '.'))
+            st.write(f"{t['rd_sum']} **{format_num(f_top10['Clicks Loss'].sum())}**")
             display_styled_dataframe(f_top10[['Keyword', 'Position Change', 'Position_Old', 'Position_New', 'Clicks Loss', 'Clicks_Old', 'Clicks_New']], sort_col='Clicks Loss')
         else:
             st.info(t["rd_t10_empty"])
             
         st.markdown(t["rd_p2_title"])
         if not f_page2.empty:
-            st.write(f"{t['rd_sum']} **{int(f_page2['Clicks Loss'].sum()):,}**".replace(',', '.'))
+            st.write(f"{t['rd_sum']} **{format_num(f_page2['Clicks Loss'].sum())}**")
             display_styled_dataframe(f_page2[['Keyword', 'Position Change', 'Position_Old', 'Position_New', 'Clicks Loss', 'Clicks_Old', 'Clicks_New']], sort_col='Clicks Loss')
         else:
             st.info(t["rd_p2_empty"])
             
         st.markdown(t["rd_100_title"])
         if not f_total.empty:
-            st.write(f"{t['rd_sum']} **{int(f_total['Clicks Loss'].sum()):,}**".replace(',', '.'))
+            st.write(f"{t['rd_sum']} **{format_num(f_total['Clicks Loss'].sum())}**")
             display_styled_dataframe(f_total[['Keyword', 'Position Change', 'Position_Old', 'Position_New', 'Clicks Loss', 'Clicks_Old', 'Clicks_New']], sort_col='Clicks Loss')
         else:
             st.info(t["rd_100_empty"])
@@ -627,8 +650,6 @@ else:
 # Footer
 st.markdown("<hr class='hr--grey'>", unsafe_allow_html=True)
 st.markdown(
-    "<div style='text-align: center; color: #797979; font-size: 0.9em;'>"
-    "MIT License &copy; 2026 Benjamin &quot;SEOux Indianer&quot; Wingerter | Erstellt in München & Bangkok | <a href='https://seouxindianer.de' target='_blank' style='color: #2ea3f2; text-decoration: underline;'>seouxindianer.de</a>"
-    "</div>", 
+    f"<div style='text-align: center; color: #797979; font-size: 0.9em;'>{t['footer']}</div>", 
     unsafe_allow_html=True
 )
