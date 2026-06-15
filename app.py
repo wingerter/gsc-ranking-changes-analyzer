@@ -732,18 +732,26 @@ if uploaded_file is not None and st.session_state['analyzed']:
     with tab5:
         st.subheader(t["win_sub"])
         if not winners.empty:
-            display_styled_dataframe(winners[['Keyword', 'Position Change', 'Position_Old', 'Position_New', 'Clicks Gain', 'Clicks_Old', 'Clicks_New']], sort_col='Clicks Gain')
+            display_winners = winners[
+                (winners['Position Change'] > 0) &
+                (~((winners['Position_New'] > 11) & (winners['Position Change'] < 9)))
+            ]
             
-            fig_win = px.scatter(
-                winners, x="Clicks Gain", y="Position_New", 
-                size="Clicks_New", color="Position Change",
-                hover_name="Keyword", title=t["win_chart_title"],
-                labels={'Position_New': t["win_chart_label_pos"], 'Clicks Gain': t["win_chart_label_gain"]},
-                color_continuous_scale=[[0.0, '#dfdfdf'], [1.0, '#90c274']]
-            )
-            fig_win.update_yaxes(autorange="reversed")
-            style_plotly_fig(fig_win)
-            st.plotly_chart(fig_win, use_container_width=True)
+            if not display_winners.empty:
+                display_styled_dataframe(display_winners[['Keyword', 'Position Change', 'Position_Old', 'Position_New', 'Clicks Gain', 'Clicks_Old', 'Clicks_New']], sort_col='Clicks Gain')
+                
+                fig_win = px.scatter(
+                    display_winners, x="Clicks Gain", y="Position_New", 
+                    size="Clicks_New", color="Position Change",
+                    hover_name="Keyword", title=t["win_chart_title"],
+                    labels={'Position_New': t["win_chart_label_pos"], 'Clicks Gain': t["win_chart_label_gain"]},
+                    color_continuous_scale=[[0.0, '#dfdfdf'], [1.0, '#90c274']]
+                )
+                fig_win.update_yaxes(autorange="reversed")
+                style_plotly_fig(fig_win)
+                st.plotly_chart(fig_win, use_container_width=True)
+            else:
+                st.info(t["win_empty"])
         else:
             st.info(t["win_empty"])
 
