@@ -463,18 +463,7 @@ if uploaded_file is not None and st.session_state['analyzed']:
         return ", ".join(intents) if intents else "undefined"
 
     df['Cluster'] = df['Keyword'].apply(get_cluster)
-    df['Search Intent'] = df['Keyword'].apply(get_intent)            if re.search(rf'\b{re.escape(term)}\b', kw_lower):
-                clusters.append(term.capitalize())
-                semantic_added = True
-                break
-                
-        if not semantic_added and not clusters:
-            clusters.append("undefined")
-            
-        return clusters
-
-    df['Cluster'] = df['Keyword'].apply(get_clusters_for_kw)
-    df_exploded = df.explode('Cluster')
+    df['Search Intent'] = df['Keyword'].apply(get_intent)
 
     st.markdown("<hr class='hr--grey'>", unsafe_allow_html=True)
     
