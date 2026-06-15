@@ -792,7 +792,7 @@ height: 100%;
             st.markdown(t["cl_detail"])
             selected_clusters = st.multiselect(t["cl_select"], options=cluster_vol['Cluster'].tolist(), default=[cluster_vol['Cluster'].iloc[0]])
             if selected_clusters:
-                cluster_df = losers[losers['Cluster'].apply(lambda x: isinstance(x, list) and any(c in selected_clusters for c in x))]
+                cluster_df = losers[losers['Cluster'].isin(selected_clusters)]
                 st.write(f"{t['cl_sum']} **{format_num(cluster_df['Clicks Loss'].sum())}**")
                 display_styled_dataframe(cluster_df[['Keyword', 'Cluster', 'Position Change', 'Position_Old', 'Position_New', 'Clicks Loss', 'Clicks_Old', 'Clicks_New']], sort_col='Clicks Loss')
         else:
