@@ -497,24 +497,114 @@ if uploaded_file is not None and st.session_state['analyzed']:
     else:
         pct_change_formatted = f"{format_num(0.0, decimal_places=1)}{pct_sign}"
         
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric(t["kpi_lost_total"], f"-{format_num(total_clicks_lost)}")
-    with col2:
-        st.metric(t["kpi_net_change"], f"+{format_num(net_clicks)}" if net_clicks > 0 else format_num(net_clicks), delta=pct_change_formatted)
-    with col3:
-        st.metric(t["kpi_gained_total"], f"+{format_num(total_clicks_gained)}")
-        
-    st.write("")
+    # Prepare data points for insertion
+    loss_val_str = f"-{format_num(total_clicks_lost)}"
+    gain_val_str = f"+{format_num(total_clicks_gained)}"
+    net_val_str = f"+{format_num(net_clicks)}" if net_clicks > 0 else format_num(net_clicks)
+    pct_val_str = pct_change_formatted
     
-    col4, col5, col6 = st.columns(3)
-    with col4:
-        st.metric(t["kpi_top3_drops"], len(top3_drops), delta=f"-{format_num(int(top3_drops['Clicks Loss'].sum()))} {t['clicks']}", delta_color="normal")
-    with col5:
-        st.metric(t["kpi_top10_drops"], len(top10_drops), delta=f"-{format_num(int(top10_drops['Clicks Loss'].sum()))} {t['clicks']}", delta_color="normal")
-    with col6:
-        st.metric(t["kpi_lhf"], len(low_hanging), delta=f"{format_num(lhf_impressions)} Imp.", delta_color="off", help=t["kpi_lhf_help"])
-        st.markdown(f"<div style='font-size: 14px; color: gray;'>{t.get('kpi_lhf_link', 'Siehe Reiter unten')}</div>", unsafe_allow_html=True)
+    top3_count = len(top3_drops)
+    top3_loss = f"-{format_num(int(top3_drops['Clicks Loss'].sum()))}"
+    
+    top10_count = len(top10_drops)
+    top10_loss = f"-{format_num(int(top10_drops['Clicks Loss'].sum()))}"
+    
+    lhf_count = len(low_hanging)
+    lhf_imp = format_num(lhf_impressions)
+
+    if lang == "DE":
+        story_text = f"""
+        <p style='font-family: "Open Sans", sans-serif; color: #444444; line-height: 1.6; font-size: 0.95rem; margin-bottom: 1rem;'>
+        Im analysierten Zeitraum verzeichnete die Website eine 
+        <strong style='color: #232323;'>Netto-Klick-Veränderung von <span style='color: {"#90c274" if net_clicks > 0 else "#d28063"}; font-weight: bold;'>{net_val_str}</span> ({pct_val_str})</strong>. 
+        Dieser Wert setzt sich aus einem <strong>Gewinn von <span style='color: #90c274; font-weight: bold;'>{gain_val_str}</span> Klicks</strong> (Gewinner-Keywords) 
+        und einem <strong>Verlust von <span style='color: #d28063; font-weight: bold;'>{loss_val_str}</span> Klicks</strong> (Verlierer-Keywords) zusammen.
+        </p>
+        
+        <h4 style='font-family: "Raleway", sans-serif; font-weight: 700; color: #232323; margin-top: 1rem; margin-bottom: 0.5rem;'>Haupttreiber des Klick-Verlusts:</h4>
+        <ul style='font-family: "Open Sans", sans-serif; color: #444444; line-height: 1.5; font-size: 0.95rem; padding-left: 1.2rem; margin-top: 0;'>
+            <li style='margin-bottom: 0.5rem;'>
+                <strong>Abstürze aus den Top 3:</strong> <span style='font-weight: bold;'>{top3_count} Keywords</span> sind aus den Top-Positionen (1-3) herausgerutscht. Dies verursachte allein einen Verlust von <span style='color: #d28063; font-weight: bold;'>{top3_loss} Klicks</span>. Diese Keywords sollten dringend analysiert werden.
+            </li>
+            <li style='margin-bottom: 0.5rem;'>
+                <strong>Abstürze aus den Top 10:</strong> <span style='font-weight: bold;'>{top10_count} Keywords</span> haben die erste Suchergebnisseite (Top 10) komplett verlassen, was zu einem Verlust von <span style='color: #d28063; font-weight: bold;'>{top10_loss} Klicks</span> führte.
+            </li>
+        </ul>
+        
+        <h4 style='font-family: "Raleway", sans-serif; font-weight: 700; color: #232323; margin-top: 1rem; margin-bottom: 0.5rem;'>Quick-Wins / Handlungsempfehlungen:</h4>
+        <ul style='font-family: "Open Sans", sans-serif; color: #444444; line-height: 1.5; font-size: 0.95rem; padding-left: 1.2rem; margin-top: 0;'>
+            <li>
+                Es wurden <strong style='color: #90c274;'>{lhf_count} Schwellen-Keywords (Low Hanging Fruits)</strong> auf den Positionen 11-15 identifiziert. Diese erzielen aktuell bereits <span style='font-weight: bold;'>{lhf_imp} Impressionen</span> auf Seite 2, generieren aber kaum Klicks. Durch gezielte On-Page-Optimierung können diese schnell auf Seite 1 geschoben werden.
+            </li>
+        </ul>
+        """
+        story_title = "Executive Summary & Marketing-Story"
+    else:
+        story_text = f"""
+        <p style='font-family: "Open Sans", sans-serif; color: #444444; line-height: 1.6; font-size: 0.95rem; margin-bottom: 1rem;'>
+        During the analyzed timeframe, the website recorded a 
+        <strong style='color: #232323;'>Net Click Change of <span style='color: {"#90c274" if net_clicks > 0 else "#d28063"}; font-weight: bold;'>{net_val_str}</span> ({pct_val_str})</strong>. 
+        This value is composed of a <strong>gain of <span style='color: #90c274; font-weight: bold;'>{gain_val_str}</span> clicks</strong> (winning keywords) 
+        and a <strong>loss of <span style='color: #d28063; font-weight: bold;'>{loss_val_str}</span> clicks</strong> (losing keywords).
+        </p>
+        
+        <h4 style='font-family: "Raleway", sans-serif; font-weight: 700; color: #232323; margin-top: 1rem; margin-bottom: 0.5rem;'>Main Drivers of Click Loss:</h4>
+        <ul style='font-family: "Open Sans", sans-serif; color: #444444; line-height: 1.5; font-size: 0.95rem; padding-left: 1.2rem; margin-top: 0;'>
+            <li style='margin-bottom: 0.5rem;'>
+                <strong>Drops from Top 3:</strong> <span style='font-weight: bold;'>{top3_count} keywords</span> slipped out of the top positions (1-3). This alone caused a loss of <span style='color: #d28063; font-weight: bold;'>{top3_loss} clicks</span>. These keywords require urgent optimization.
+            </li>
+            <li style='margin-bottom: 0.5rem;'>
+                <strong>Drops from Top 10:</strong> <span style='font-weight: bold;'>{top10_count} keywords</span> fell completely off the first search engine results page (Top 10), resulting in a loss of <span style='color: #d28063; font-weight: bold;'>{top10_loss} clicks</span>.
+            </li>
+        </ul>
+        
+        <h4 style='font-family: "Raleway", sans-serif; font-weight: 700; color: #232323; margin-top: 1rem; margin-bottom: 0.5rem;'>Quick-Wins / Actionable Recommendations:</h4>
+        <ul style='font-family: "Open Sans", sans-serif; color: #444444; line-height: 1.5; font-size: 0.95rem; padding-left: 1.2rem; margin-top: 0;'>
+            <li>
+                We identified <strong style='color: #90c274;'>{lhf_count} Threshold Keywords (Low Hanging Fruits)</strong> ranking on positions 11-15. These already generate <span style='font-weight: bold;'>{lhf_imp} impressions</span> on page 2 but drive very little traffic. Targeted on-page optimization can push these onto page 1 quickly.
+            </li>
+        </ul>
+        """
+        story_title = "Executive Summary & Marketing Story"
+
+    kpi_col1, kpi_col2 = st.columns([5, 3])
+    
+    with kpi_col1:
+        st.markdown(
+            f"""
+            <div style='
+                background-color: #ffffff;
+                border: 1px solid #dfdfdf;
+                border-radius: 14px;
+                box-shadow: 0 2px 8px rgba(35, 35, 35, 0.07);
+                padding: 1.75rem;
+                height: 100%;
+            '>
+                <h3 style='margin-top: 0; margin-bottom: 1rem; font-family: "Raleway", sans-serif; font-weight: 800; color: #232323;'>
+                    {story_title}
+                </h3>
+                {story_text}
+            </div>
+            """, 
+            unsafe_allow_html=True
+        )
+
+    with kpi_col2:
+        st.metric(t["kpi_net_change"], net_val_str, delta=pct_val_str)
+        
+        sub_c1, sub_c2 = st.columns(2)
+        with sub_c1:
+            st.metric(t["kpi_lost_total"], loss_val_str)
+        with sub_c2:
+            st.metric(t["kpi_gained_total"], gain_val_str)
+            
+        sub_c3, sub_c4 = st.columns(2)
+        with sub_c3:
+            st.metric(t["kpi_top3_drops"], f"{top3_count}", delta=top3_loss, delta_color="normal")
+        with sub_c4:
+            st.metric(t["kpi_top10_drops"], f"{top10_count}", delta=top10_loss, delta_color="normal")
+            
+        st.metric(t["kpi_lhf"], f"{lhf_count}", delta=f"{lhf_imp} Imp.", delta_color="off", help=t["kpi_lhf_help"])
         
     st.markdown("<hr class='hr--grey'>", unsafe_allow_html=True)
     
