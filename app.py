@@ -102,6 +102,7 @@ translations = {
         "kpi_lhf_link": "See tab below",
         "kpi_lhf_help": "Actual impressions generated in the current timeframe by keywords ranking on positions 11-15. High impressions here mean great potential if pushed to page 1.",
         "kpi_top3_title": "Top 3 Drops (Worst 5)",
+        "kpi_intent_title": "Search Intent Distribution",
         "footer": "MIT License &copy; 2026 Benjamin &quot;SEOux Indianer&quot; Wingerter | Created in Munich & Bangkok with ❤️ | <a href='https://seouxindianer.de' target='_blank' style='color: #2ea3f2; text-decoration: underline;'>seouxindianer.de</a>",
         "legal_header": "Legal & Privacy Policy",
         "imprint_body": """### Imprint
@@ -212,6 +213,7 @@ You have the right to access, rectify, erase, or restrict the processing of your
         "kpi_lhf_link": "Siehe Reiter unten",
         "kpi_lhf_help": "Echte Impressionen, die diese Keywords im aktuellen Zeitraum auf den Positionen 11-15 gesammelt haben. Viele Impressionen hier bedeuten hohes Potenzial für Seite 1.",
         "kpi_top3_title": "Top 3 Abstürze (Die 5 schlimmsten)",
+        "kpi_intent_title": "Suchintents-Verteilung",
         "footer": "MIT License &copy; 2026 Benjamin &quot;SEOux Indianer&quot; Wingerter | Erstellt in München & Bangkok mit ❤️ | <a href='https://seouxindianer.de' target='_blank' style='color: #2ea3f2; text-decoration: underline;'>seouxindianer.de</a>",
         "legal_header": "Rechtliches / Impressum",
         "imprint_body": """### Impressum
@@ -563,6 +565,49 @@ if uploaded_file is not None and st.session_state['analyzed']:
             st.plotly_chart(fig_t3, use_container_width=True)
         else:
             st.info(t["rd_t3_empty"])
+            
+    st.write("")
+    viz_col3, viz_col4 = st.columns(2)
+    with viz_col3:
+        st.markdown("#### " + t["kpi_intent_title"])
+        # Split multiple intents per keyword
+        intent_df = df.assign(Intent=df['Search Intent'].str.split(', ')).explode('Intent')
+        intent_counts = intent_df['Intent'].value_counts().reset_index()
+        intent_counts.columns = ['Search Intent', 'Count']
+        
+        color_map = {
+            "DO (Transactional)": "#90c274",
+            "KNOW": "#2ea3f2",
+            "regional:CITY": "#ffed00",
+            "regional:COUNTRY": "#f29e2e",
+            "undefined": "#dfdfdf"
+        }
+        
+        fig_pie = px.pie(
+            intent_counts, values='Count', names='Search Intent',
+            color='Search Intent', color_discrete_map=color_map,
+            hole=0.4,
+            height=280
+        )
+        style_plotly_fig(fig_pie)
+        fig_pie.update_layout(margin=dict(l=10, r=10, t=25, b=10))
+        st.plotly_chart(fig_pie, use_container_width=True)
+        
+    with viz_col4:
+        st.markdown("#### Details" if lang == "EN" else "#### Details")
+        intent_pct = intent_df['Intent'].value_counts(normalize=True).reset_index()
+        intent_pct.columns = ['Search Intent', 'Percentage']
+        intent_pct['Percentage'] = intent_pct['Percentage'].apply(lambda x: f"{x*100:.1f}%")
+        
+        intent_summary = pd.merge(intent_counts, intent_pct, on='Search Intent')
+        intent_summary.columns = [
+            'Search Intent' if lang == 'EN' else 'Suchintent',
+            'Keywords (Count)' if lang == 'EN' else 'Keywords (Anzahl)',
+            'Share (%)' if lang == 'EN' else 'Anteil (%)'
+        ]
+        
+        st.write("")
+        st.dataframe(intent_summary, use_container_width=True, hide_index=True)
             
     st.markdown("<hr class='hr--grey'>", unsafe_allow_html=True)
 
