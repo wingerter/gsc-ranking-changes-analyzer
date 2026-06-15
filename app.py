@@ -409,7 +409,9 @@ if uploaded_file is not None and st.session_state['analyzed']:
     
     stopwords = stopwords_en if lang == "EN" else stopwords_de
     
-    brand_terms = [b.strip().lower() for b in     def is_brand(kw):
+    brand_terms = [b.strip().lower() for b in brand_input.split(',')] if brand_input.strip() else []
+    
+    def is_brand(kw):
         kw_lower = str(kw).lower()
         for b in brand_terms:
             if b and b in kw_lower:
