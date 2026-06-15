@@ -513,79 +513,73 @@ if uploaded_file is not None and st.session_state['analyzed']:
     lhf_imp = format_num(lhf_impressions)
 
     if lang == "DE":
-        story_text = f"""
-        <p style='font-family: "Open Sans", sans-serif; color: #444444; line-height: 1.6; font-size: 0.95rem; margin-bottom: 1rem;'>
-        Im analysierten Zeitraum verzeichnete die Website eine 
-        <strong style='color: #232323;'>Netto-Klick-Veränderung von <span style='color: {"#90c274" if net_clicks > 0 else "#d28063"}; font-weight: bold;'>{net_val_str}</span> ({pct_val_str})</strong>. 
-        Dieser Wert setzt sich aus einem <strong>Gewinn von <span style='color: #90c274; font-weight: bold;'>{gain_val_str}</span> Klicks</strong> (Gewinner-Keywords) 
-        und einem <strong>Verlust von <span style='color: #d28063; font-weight: bold;'>{loss_val_str}</span> Klicks</strong> (Verlierer-Keywords) zusammen.
-        </p>
-        
-        <h4 style='font-family: "Raleway", sans-serif; font-weight: 700; color: #232323; margin-top: 1rem; margin-bottom: 0.5rem;'>Haupttreiber des Klick-Verlusts:</h4>
-        <ul style='font-family: "Open Sans", sans-serif; color: #444444; line-height: 1.5; font-size: 0.95rem; padding-left: 1.2rem; margin-top: 0;'>
-            <li style='margin-bottom: 0.5rem;'>
-                <strong>Abstürze aus den Top 3:</strong> <span style='font-weight: bold;'>{top3_count} Keywords</span> sind aus den Top-Positionen (1-3) herausgerutscht. Dies verursachte allein einen Verlust von <span style='color: #d28063; font-weight: bold;'>{top3_loss} Klicks</span>. Diese Keywords sollten dringend analysiert werden.
-            </li>
-            <li style='margin-bottom: 0.5rem;'>
-                <strong>Abstürze aus den Top 10:</strong> <span style='font-weight: bold;'>{top10_count} Keywords</span> haben die erste Suchergebnisseite (Top 10) komplett verlassen, was zu einem Verlust von <span style='color: #d28063; font-weight: bold;'>{top10_loss} Klicks</span> führte.
-            </li>
-        </ul>
-        
-        <h4 style='font-family: "Raleway", sans-serif; font-weight: 700; color: #232323; margin-top: 1rem; margin-bottom: 0.5rem;'>Quick-Wins / Handlungsempfehlungen:</h4>
-        <ul style='font-family: "Open Sans", sans-serif; color: #444444; line-height: 1.5; font-size: 0.95rem; padding-left: 1.2rem; margin-top: 0;'>
-            <li>
-                Es wurden <strong style='color: #90c274;'>{lhf_count} Schwellen-Keywords (Low Hanging Fruits)</strong> auf den Positionen 11-15 identifiziert. Diese erzielen aktuell bereits <span style='font-weight: bold;'>{lhf_imp} Impressionen</span> auf Seite 2, generieren aber kaum Klicks. Durch gezielte On-Page-Optimierung können diese schnell auf Seite 1 geschoben werden.
-            </li>
-        </ul>
-        """
+        story_text = f"""<p style='font-family: "Open Sans", sans-serif; color: #444444; line-height: 1.6; font-size: 0.95rem; margin-bottom: 1rem;'>
+Im analysierten Zeitraum verzeichnete die Website eine 
+<strong style='color: #232323;'>Netto-Klick-Veränderung von <span style='color: {"#90c274" if net_clicks > 0 else "#d28063"}; font-weight: bold;'>{net_val_str}</span> ({pct_val_str})</strong>. 
+Dieser Wert setzt sich aus einem <strong>Gewinn von <span style='color: #90c274; font-weight: bold;'>{gain_val_str}</span> Klicks</strong> (Gewinner-Keywords) 
+und einem <strong>Verlust von <span style='color: #d28063; font-weight: bold;'>{loss_val_str}</span> Klicks</strong> (Verlierer-Keywords) zusammen.
+</p>
+
+<h4 style='font-family: "Raleway", sans-serif; font-weight: 700; color: #232323; margin-top: 1rem; margin-bottom: 0.5rem;'>Haupttreiber des Klick-Verlusts:</h4>
+<ul style='font-family: "Open Sans", sans-serif; color: #444444; line-height: 1.5; font-size: 0.95rem; padding-left: 1.2rem; margin-top: 0;'>
+<li style='margin-bottom: 0.5rem;'>
+<strong>Abstürze aus den Top 3:</strong> <span style='font-weight: bold;'>{top3_count} Keywords</span> sind aus den Top-Positionen (1-3) herausgerutscht. Dies verursachte allein einen Verlust von <span style='color: #d28063; font-weight: bold;'>{top3_loss} Klicks</span>. Diese Keywords sollten dringend analysiert werden.
+</li>
+<li style='margin-bottom: 0.5rem;'>
+<strong>Abstürze aus den Top 10:</strong> <span style='font-weight: bold;'>{top10_count} Keywords</span> haben die erste Suchergebnisseite (Top 10) komplett verlassen, was zu einem Verlust von <span style='color: #d28063; font-weight: bold;'>{top10_loss} Klicks</span> führte.
+</li>
+</ul>
+
+<h4 style='font-family: "Raleway", sans-serif; font-weight: 700; color: #232323; margin-top: 1rem; margin-bottom: 0.5rem;'>Quick-Wins / Handlungsempfehlungen:</h4>
+<ul style='font-family: "Open Sans", sans-serif; color: #444444; line-height: 1.5; font-size: 0.95rem; padding-left: 1.2rem; margin-top: 0;'>
+<li>
+Es wurden <strong style='color: #90c274;'>{lhf_count} Schwellen-Keywords (Low Hanging Fruits)</strong> auf den Positionen 11-15 identifiziert. Diese erzielen aktuell bereits <span style='font-weight: bold;'>{lhf_imp} Impressionen</span> auf Seite 2, generieren aber kaum Klicks. Durch gezielte On-Page-Optimierung können diese schnell auf Seite 1 geschoben werden.
+</li>
+</ul>"""
         story_title = "Executive Summary & Marketing-Story"
     else:
-        story_text = f"""
-        <p style='font-family: "Open Sans", sans-serif; color: #444444; line-height: 1.6; font-size: 0.95rem; margin-bottom: 1rem;'>
-        During the analyzed timeframe, the website recorded a 
-        <strong style='color: #232323;'>Net Click Change of <span style='color: {"#90c274" if net_clicks > 0 else "#d28063"}; font-weight: bold;'>{net_val_str}</span> ({pct_val_str})</strong>. 
-        This value is composed of a <strong>gain of <span style='color: #90c274; font-weight: bold;'>{gain_val_str}</span> clicks</strong> (winning keywords) 
-        and a <strong>loss of <span style='color: #d28063; font-weight: bold;'>{loss_val_str}</span> clicks</strong> (losing keywords).
-        </p>
-        
-        <h4 style='font-family: "Raleway", sans-serif; font-weight: 700; color: #232323; margin-top: 1rem; margin-bottom: 0.5rem;'>Main Drivers of Click Loss:</h4>
-        <ul style='font-family: "Open Sans", sans-serif; color: #444444; line-height: 1.5; font-size: 0.95rem; padding-left: 1.2rem; margin-top: 0;'>
-            <li style='margin-bottom: 0.5rem;'>
-                <strong>Drops from Top 3:</strong> <span style='font-weight: bold;'>{top3_count} keywords</span> slipped out of the top positions (1-3). This alone caused a loss of <span style='color: #d28063; font-weight: bold;'>{top3_loss} clicks</span>. These keywords require urgent optimization.
-            </li>
-            <li style='margin-bottom: 0.5rem;'>
-                <strong>Drops from Top 10:</strong> <span style='font-weight: bold;'>{top10_count} keywords</span> fell completely off the first search engine results page (Top 10), resulting in a loss of <span style='color: #d28063; font-weight: bold;'>{top10_loss} clicks</span>.
-            </li>
-        </ul>
-        
-        <h4 style='font-family: "Raleway", sans-serif; font-weight: 700; color: #232323; margin-top: 1rem; margin-bottom: 0.5rem;'>Quick-Wins / Actionable Recommendations:</h4>
-        <ul style='font-family: "Open Sans", sans-serif; color: #444444; line-height: 1.5; font-size: 0.95rem; padding-left: 1.2rem; margin-top: 0;'>
-            <li>
-                We identified <strong style='color: #90c274;'>{lhf_count} Threshold Keywords (Low Hanging Fruits)</strong> ranking on positions 11-15. These already generate <span style='font-weight: bold;'>{lhf_imp} impressions</span> on page 2 but drive very little traffic. Targeted on-page optimization can push these onto page 1 quickly.
-            </li>
-        </ul>
-        """
+        story_text = f"""<p style='font-family: "Open Sans", sans-serif; color: #444444; line-height: 1.6; font-size: 0.95rem; margin-bottom: 1rem;'>
+During the analyzed timeframe, the website recorded a 
+<strong style='color: #232323;'>Net Click Change of <span style='color: {"#90c274" if net_clicks > 0 else "#d28063"}; font-weight: bold;'>{net_val_str}</span> ({pct_val_str})</strong>. 
+This value is composed of a <strong>gain of <span style='color: #90c274; font-weight: bold;'>{gain_val_str}</span> clicks</strong> (winning keywords) 
+and a <strong>loss of <span style='color: #d28063; font-weight: bold;'>{loss_val_str}</span> clicks</strong> (losing keywords).
+</p>
+
+<h4 style='font-family: "Raleway", sans-serif; font-weight: 700; color: #232323; margin-top: 1rem; margin-bottom: 0.5rem;'>Main Drivers of Click Loss:</h4>
+<ul style='font-family: "Open Sans", sans-serif; color: #444444; line-height: 1.5; font-size: 0.95rem; padding-left: 1.2rem; margin-top: 0;'>
+<li style='margin-bottom: 0.5rem;'>
+<strong>Drops from Top 3:</strong> <span style='font-weight: bold;'>{top3_count} keywords</span> slipped out of the top positions (1-3). This alone caused a loss of <span style='color: #d28063; font-weight: bold;'>{top3_loss} clicks</span>. These keywords require urgent optimization.
+</li>
+<li style='margin-bottom: 0.5rem;'>
+<strong>Drops from Top 10:</strong> <span style='font-weight: bold;'>{top10_count} keywords</span> fell completely off the first search engine results page (Top 10), resulting in a loss of <span style='color: #d28063; font-weight: bold;'>{top10_loss} clicks</span>.
+</li>
+</ul>
+
+<h4 style='font-family: "Raleway", sans-serif; font-weight: 700; color: #232323; margin-top: 1rem; margin-bottom: 0.5rem;'>Quick-Wins / Actionable Recommendations:</h4>
+<ul style='font-family: "Open Sans", sans-serif; color: #444444; line-height: 1.5; font-size: 0.95rem; padding-left: 1.2rem; margin-top: 0;'>
+<li>
+We identified <strong style='color: #90c274;'>{lhf_count} Threshold Keywords (Low Hanging Fruits)</strong> ranking on positions 11-15. These already generate <span style='font-weight: bold;'>{lhf_imp} impressions</span> on page 2 but drive very little traffic. Targeted on-page optimization can push these onto page 1 quickly.
+</li>
+</ul>"""
         story_title = "Executive Summary & Marketing Story"
 
     kpi_col1, kpi_col2 = st.columns([5, 3])
     
     with kpi_col1:
         st.markdown(
-            f"""
-            <div style='
-                background-color: #ffffff;
-                border: 1px solid #dfdfdf;
-                border-radius: 14px;
-                box-shadow: 0 2px 8px rgba(35, 35, 35, 0.07);
-                padding: 1.75rem;
-                height: 100%;
-            '>
-                <h3 style='margin-top: 0; margin-bottom: 1rem; font-family: "Raleway", sans-serif; font-weight: 800; color: #232323;'>
-                    {story_title}
-                </h3>
-                {story_text}
-            </div>
-            """, 
+            f"""<div style='
+background-color: #ffffff;
+border: 1px solid #dfdfdf;
+border-radius: 14px;
+box-shadow: 0 2px 8px rgba(35, 35, 35, 0.07);
+padding: 1.75rem;
+height: 100%;
+'>
+<h3 style='margin-top: 0; margin-bottom: 1rem; font-family: "Raleway", sans-serif; font-weight: 800; color: #232323;'>
+{story_title}
+</h3>
+{story_text}
+</div>""", 
             unsafe_allow_html=True
         )
 
