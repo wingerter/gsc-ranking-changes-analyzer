@@ -913,7 +913,19 @@ else:
 
 # Footer
 st.markdown("<hr class='hr--grey'>", unsafe_allow_html=True)
+
+version = "v1.0.25"  # Fallback matching next commit
+try:
+    import subprocess
+    commit_count = subprocess.check_output(["git", "rev-list", "--count", "HEAD"], stderr=subprocess.DEVNULL).decode("utf-8").strip()
+    commit_hash = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], stderr=subprocess.DEVNULL).decode("utf-8").strip()
+    if commit_count and commit_hash:
+        version = f"v1.0.{commit_count} ({commit_hash})"
+except Exception:
+    pass
+
+footer_text = f"{t['footer']} | <span style='opacity: 0.8;'>Version {version}</span>"
 st.markdown(
-    f"<div style='text-align: center; color: #797979; font-size: 0.9em;'>{t['footer']}</div>", 
+    f"<div style='text-align: center; color: #797979; font-size: 0.9em;'>{footer_text}</div>", 
     unsafe_allow_html=True
 )
