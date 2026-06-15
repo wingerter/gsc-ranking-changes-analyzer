@@ -572,8 +572,66 @@ if uploaded_file is not None and st.session_state['analyzed']:
     st.markdown("<hr class='hr--grey'>", unsafe_allow_html=True)
 
     def display_styled_dataframe(df_to_show, sort_col, ascending=False):
-        df_sorted = df_to_show.sort_values(sort_col, ascending=ascending)
-        st.dataframe(df_sorted, use_container_width=True, hide_index=True)
+        loss_cols = [c for c in ['Clicks Loss'] if c in df_to_show.columns]
+        gain_cols = [c for c in ['Clicks Gain'] if c in df_to_show.columns]
+        
+        styler = df_to_show.sort_values(sort_col, ascending=ascending).style
+        format_dict = {}
+        
+        if loss_cols:
+            styler = styler.map(lambda x: 'color: #d28063; font-weight: bold;' if pd.notnull(x) and x > 0 else '', subset=loss_cols)
+            for c in loss_cols:
+                format_dict[c] = lambda x: f"▼ -{format_num(x)}" if pd.notnull(x) and x > 0 else ("0" if pd.notnull(x) else "")
+                
+        if gain_cols:
+            styler = styler.map(lambda x: 'color: #90c274; font-weight: bold;' if pd.notnull(x) and x > 0 else '', subset=gain_cols)
+            for c in gain_cols:
+                format_dict[c] = lambda x: f"▲ +{format_num(x)}" if pd.notnull(x) and x > 0 else ("0" if pd.notnull(x) else "")
+                
+        for c in ['Clicks_New', 'Clicks_Old', 'Impressions_New', 'Impressions_Old']:
+            if c in df_to_show.columns:
+                format_dict[c] = lambda x: format_num(x) if pd.notnull(x) else ""
+                
+        for c in ['Position_New', 'Position_Old']:
+            if c in df_to_show.columns:
+                format_dict[c] = lambda x: format_num(x, decimal_places=2) if pd.notnull(x) and x != 101 else ("-" if x == 101 else "")
+                
+        if 'Position Change' in df_to_show.columns:
+            def style_pos_change(x):
+                if pd.isnull(x) or abs(x) > 90: return ''
+                if x > 0: return 'color: #90c274; font-weight: bold;'
+                if x < 0: return 'color: #d28063; font-weight: bold;'
+                return ''
+            styler = styler.map(style_pos_change, subset=['Position Change'])
+            
+            def format_pos_change(x):
+                if pd.isnull(x) or abs(x) > 90: return "-"
+                val = format_num(abs(x), decimal_places=2)
+                if x > 0: val = f"▲ +{val}"
+                elif x < 0: val = f"▼ -{val}"
+                return val
+                
+            format_dict['Position Change'] = format_pos_change
+            
+        if 'Clicks Change' in df_to_show.columns:
+            def style_clicks_change(x):
+                if pd.isnull(x) or x == 0: return ''
+                if x > 0: return 'color: #90c274; font-weight: bold;'
+                if x < 0: return 'color: #d28063; font-weight: bold;'
+                return ''
+            styler = styler.map(style_clicks_change, subset=['Clicks Change'])
+            
+            def format_clicks_change(x):
+                if pd.isnull(x) or x == 0: return "0"
+                val = format_num(abs(x))
+                if x > 0: val = f"▲ +{val}"
+                elif x < 0: val = f"▼ -{val}"
+                return val
+                
+            format_dict['Clicks Change'] = format_clicks_change
+            
+        styler = styler.format(format_dict)
+        st.dataframe(styler, use_container_width=True)
 
     # --- Visualizations & Tabs ---
     st.header("Details" if lang == "DE" else "Details")
