@@ -35,3 +35,6 @@ Thumbs.db
 
 # Temporary design resources
 _TEMP/
+
+# Agent configuration
+.agents/
