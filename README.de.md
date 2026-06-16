@@ -88,4 +88,5 @@ Die gesamte Verarbeitung läuft lokal (oder in deiner eigenen Streamlit-Instanz)
 ## 📝 Lizenz & Credits
 
 MIT License © 2026 Benjamin "SEOux Indianer" Wingerter
-Made with ❤️ in Munich & Bangkok: [seouxindianer.de](https://seouxindianer.de)
+Made with ❤️ in Munich & Bangkok: [seouxindianer.de](https://seouxindianer.de)  
+Mitentwickelt von Antigravity (KI-Coding-Assistent von Google DeepMind)

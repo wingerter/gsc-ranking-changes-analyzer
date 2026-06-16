@@ -99,6 +99,7 @@ All processing happens locally (or in your own Streamlit instance). Your `Querie
 ---
 
 ## 📝 License & Credits
-
+ 
 MIT License © 2026 Benjamin "SEOux Indianer" Wingerter
-Made with ❤️ in Munich & Bangkok — [seouxindianer.de](https://seouxindianer.de)
+Made with ❤️ in Munich & Bangkok — [seouxindianer.de](https://seouxindianer.de)  
+Co-developed with Antigravity (Google DeepMind's AI coding assistant)
