@@ -462,6 +462,23 @@ if uploaded_file is not None and st.session_state['analyzed']:
             if re.search(r'.*belgien.*|.*bulgarien.*|.*dänemark.*|.*deutschland.*|.*estland.*|.*finnland.*|.*frankreich.*|.*griechenland.*|.*irland.*|.*italien.*|.*kroatien.*|.*lettland.*|.*litauen.*|.*luxemburg.*|.*malta.*|.*niederlande.*|.*österreich.*|.*polen.*|.*portugal.*|.*rumänien.*', kw_lower):
                 intents.append("regional:COUNTRY")
                 
+        elif data_lang_choice == "English":
+            # User Intent: KNOW
+            if re.search(r'\b(who|what|where|when|why|how|which|whose|whom|guide|tutorial|tips|definition|explain|explanation|how\s+to|faq|forum|info|information|meaning|instruction|manual|example|examples|case\s+study|learn|training|course|help|support|diy|walkthrough)\b', kw_lower):
+                intents.append("KNOW")
+                
+            # User Intent: DO (Transactional)
+            if re.search(r'\b(buy|order|cheap|coupon|discount|download|free|shop|price|pricing|sale|purchase|store|promo|deal|deals|rent|hire|cheapest|voucher|booking|book)\b', kw_lower):
+                intents.append("DO (Transactional)")
+
+            # User Intent: regional:CITY
+            if re.search(r'\b(near\s+me|local|nearby|map|directions|address|hours|opening\s+hours|london|new\s+york|nyc|los\s+angeles|chicago|houston|phoenix|philadelphia|dallas|san\s+diego|austin|san\s+francisco|seattle|denver|boston|miami|atlanta|las\s+vegas|toronto|vancouver|sydney|melbourne|brisbane|perth|auckland)\b', kw_lower):
+                intents.append("regional:CITY")
+
+            # User Intent: regional:COUNTRY
+            if re.search(r'\b(us|usa|united\s+states|uk|united\s+kingdom|england|great\s+britain|canada|australia|nz|new\s+zealand|ireland|scotland|wales|south\s+africa)\b', kw_lower):
+                intents.append("regional:COUNTRY")
+                
         return ", ".join(intents) if intents else "undefined"
 
     df['Cluster'] = df['Keyword'].apply(get_cluster)
