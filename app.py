@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 import io
 import re
 from collections import Counter
+import streamlit.components.v1 as components
 
 st.set_page_config(
     page_title="GSC Ranking Changes Analyzer",
@@ -596,6 +597,7 @@ We identified <strong style='color: #90c274;'>{lhf_count} Threshold Keywords (Lo
             def select_lhf_tab():
                 st.session_state["main_tabs"] = t["tab_lhf"]
                 st.query_params["tab"] = "lhf"
+                st.session_state["scroll_to_lhf"] = True
 
             btn_label = f"🎯 Zeige alle {lhf_count} Low Hanging Fruits" if lang == "DE" else f"🎯 Show all {lhf_count} Low Hanging Fruits"
             st.button(btn_label, key="goto_lhf_btn", on_click=select_lhf_tab, type="secondary")
@@ -787,6 +789,7 @@ We identified <strong style='color: #90c274;'>{lhf_count} Threshold Keywords (Lo
     if "tab" in st.query_params and "main_tabs" not in st.session_state:
         if st.query_params["tab"] == "lhf":
             st.session_state["main_tabs"] = t["tab_lhf"]
+            st.session_state["scroll_to_lhf"] = True
 
     # --- Visualizations & Tabs ---
     st.header("Details" if lang == "DE" else "Details")
@@ -938,6 +941,23 @@ We identified <strong style='color: #90c274;'>{lhf_count} Threshold Keywords (Lo
             f_df = f_df[f_df['Keyword'].astype(str).str.lower().str.contains(search_kw.lower(), na=False)]
             
         display_styled_dataframe(f_df, sort_col='Clicks Change', ascending=False)
+
+        # Execute smooth scroll down to Low Hanging Fruits if flag is set
+        if st.session_state.get("scroll_to_lhf"):
+            components.html(
+                """
+                <script>
+                    setTimeout(function() {
+                        var el = window.parent.document.getElementById("low-hanging-fruits");
+                        if (el) {
+                            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    }, 300);
+                </script>
+                """,
+                height=0
+            )
+            st.session_state["scroll_to_lhf"] = False
 
 else:
     st.info(translations[lang]["info_upload"])
