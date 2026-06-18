@@ -304,6 +304,106 @@ def style_plotly_fig(fig):
 st.title(t["title"])
 st.markdown(t["subtitle"])
 
+# --- Custom Loading Overlay ---
+loading_placeholder = st.empty()
+
+if st.session_state.get("show_custom_loader"):
+    import base64
+    import time
+    
+    logo_base64 = ""
+    try:
+        with open("assets/logo-head-clear.png", "rb") as image_file:
+            logo_base64 = base64.b64encode(image_file.read()).decode('utf-8')
+    except Exception:
+        pass
+        
+    custom_loader_html = f"""
+    <div class="custom-loader-overlay">
+        <div class="loader-logo-container">
+            <img class="loader-logo" src="data:image/png;base64,{logo_base64}" />
+            <svg class="loader-svg" viewBox="0 0 100 100">
+                <circle class="loader-bg-circle" cx="50" cy="50" r="45" />
+                <circle class="loader-fill-circle" cx="50" cy="50" r="45" />
+            </svg>
+        </div>
+    </div>
+    <style>
+    .custom-loader-overlay {{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(35, 35, 35, 0.15); /* Very slightly darkened */
+        backdrop-filter: blur(2px); /* Premium subtle blur */
+        z-index: 999999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        pointer-events: all;
+    }}
+    .loader-logo-container {{
+        position: relative;
+        width: 140px;
+        height: 140px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #ffffff;
+        border-radius: 50%;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }}
+    .loader-logo {{
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        z-index: 1;
+    }}
+    .loader-svg {{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 140px;
+        height: 140px;
+        z-index: 2;
+    }}
+    .loader-bg-circle {{
+        fill: none;
+        stroke: rgba(153, 51, 51, 0.05);
+        stroke-width: 6;
+    }}
+    .loader-fill-circle {{
+        fill: none;
+        stroke: rgba(153, 51, 51, 0.7); /* 30% transparent */
+        stroke-width: 6;
+        stroke-linecap: round;
+        stroke-dasharray: 283;
+        stroke-dashoffset: 283;
+        animation: fill-progress 1.5s ease-in-out infinite alternate, rotate-spinner 2s linear infinite;
+        transform-origin: center;
+    }}
+    @keyframes fill-progress {{
+        0% {{
+            stroke-dashoffset: 283;
+        }}
+        100% {{
+            stroke-dashoffset: 28;
+        }}
+    }}
+    @keyframes rotate-spinner {{
+        0% {{
+            transform: rotate(0deg);
+        }}
+        100% {{
+            transform: rotate(360deg);
+        }}
+    }}
+    </style>
+    """
+    loading_placeholder.markdown(custom_loader_html, unsafe_allow_html=True)
+    time.sleep(1.2)  # Give the premium loading animation time to run
+
 # Sidebar - Settings
 st.sidebar.header(t["sidebar_data"])
 uploaded_file = st.sidebar.file_uploader(t["upload_label"], type=["csv"])
@@ -598,16 +698,19 @@ We identified <strong style='color: #90c274;'>{lhf_count} Threshold Keywords (Lo
                 st.session_state["main_tabs"] = t["tab_lhf"]
                 st.query_params["tab"] = "lhf"
                 st.session_state["scroll_target"] = "low-hanging-fruits"
+                st.session_state["show_custom_loader"] = True
 
             def select_top3_tab():
                 st.session_state["main_tabs"] = t["tab_drops"]
                 st.query_params["tab"] = "top3"
                 st.session_state["scroll_target"] = "top3-drops"
+                st.session_state["show_custom_loader"] = True
 
             def select_top10_tab():
                 st.session_state["main_tabs"] = t["tab_drops"]
                 st.query_params["tab"] = "top10"
                 st.session_state["scroll_target"] = "top10-drops"
+                st.session_state["show_custom_loader"] = True
 
             # Render action buttons in a row inside the container
             b_col1, b_col2, b_col3 = st.columns(3)
@@ -1013,3 +1116,8 @@ st.markdown(
     f"<div style='text-align: center; color: #797979; font-size: 0.9em;'>{footer_text}</div>", 
     unsafe_allow_html=True
 )
+
+# Clear custom loader state at the end of the run
+if st.session_state.get("show_custom_loader"):
+    st.session_state["show_custom_loader"] = False
+    loading_placeholder.empty()
