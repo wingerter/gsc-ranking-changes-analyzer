@@ -583,22 +583,22 @@ We identified <strong style='color: #90c274;'>{lhf_count} Threshold Keywords (Lo
     kpi_col1, kpi_col2 = st.columns([5, 3])
     
     with kpi_col1:
-        st.markdown(
-            f"""<div style='
-background-color: #ffffff;
-border: 1px solid #dfdfdf;
-border-radius: 14px;
-box-shadow: 0 2px 8px rgba(35, 35, 35, 0.07);
-padding: 1.75rem;
-height: 100%;
-'>
-<h3 style='margin-top: 0; margin-bottom: 1rem; font-family: "Raleway", sans-serif; font-weight: 800; color: #232323;'>
+        with st.container(border=True):
+            st.markdown(
+                f"""<h3 style='margin-top: 0; margin-bottom: 1rem; font-family: "Raleway", sans-serif; font-weight: 800; color: #232323;'>
 {story_title}
 </h3>
-{story_text}
-</div>""", 
-            unsafe_allow_html=True
-        )
+{story_text}""", 
+                unsafe_allow_html=True
+            )
+            
+            # Action button to programmatically switch to Low Hanging Fruits tab
+            def select_lhf_tab():
+                st.session_state["main_tabs"] = t["tab_lhf"]
+                st.query_params["tab"] = "lhf"
+
+            btn_label = f"🎯 Zeige alle {lhf_count} Low Hanging Fruits" if lang == "DE" else f"🎯 Show all {lhf_count} Low Hanging Fruits"
+            st.button(btn_label, key="goto_lhf_btn", on_click=select_lhf_tab, type="secondary")
 
     with kpi_col2:
         st.metric(t["kpi_net_change"], net_val_str, delta=pct_val_str)
@@ -774,6 +774,20 @@ height: 100%;
         styler = styler.format(format_dict)
         st.dataframe(styler, use_container_width=True)
 
+    # Callback when user switches tab manually to keep query params in sync
+    def on_tab_change():
+        active_tab = st.session_state.get("main_tabs")
+        if active_tab == t["tab_lhf"]:
+            st.query_params["tab"] = "lhf"
+        else:
+            if "tab" in st.query_params:
+                del st.query_params["tab"]
+
+    # Handle deep-linking on initial load / rerun
+    if "tab" in st.query_params and "main_tabs" not in st.session_state:
+        if st.query_params["tab"] == "lhf":
+            st.session_state["main_tabs"] = t["tab_lhf"]
+
     # --- Visualizations & Tabs ---
     st.header("Details" if lang == "DE" else "Details")
     
@@ -784,7 +798,7 @@ height: 100%;
         t["tab_lhf"], 
         t["tab_winners"],
         t["tab_all"]
-    ])
+    ], key="main_tabs", on_change=on_tab_change)
     
     with tab1:
         st.subheader(t["cl_sub"])
