@@ -593,14 +593,33 @@ We identified <strong style='color: #90c274;'>{lhf_count} Threshold Keywords (Lo
                 unsafe_allow_html=True
             )
             
-            # Action button to programmatically switch to Low Hanging Fruits tab
+            # Callbacks to switch tabs programmatically with scrolling
             def select_lhf_tab():
                 st.session_state["main_tabs"] = t["tab_lhf"]
                 st.query_params["tab"] = "lhf"
-                st.session_state["scroll_to_lhf"] = True
+                st.session_state["scroll_target"] = "low-hanging-fruits"
 
-            btn_label = f"🎯 Zeige alle {lhf_count} Low Hanging Fruits" if lang == "DE" else f"🎯 Show all {lhf_count} Low Hanging Fruits"
-            st.button(btn_label, key="goto_lhf_btn", on_click=select_lhf_tab, type="secondary")
+            def select_top3_tab():
+                st.session_state["main_tabs"] = t["tab_drops"]
+                st.query_params["tab"] = "top3"
+                st.session_state["scroll_target"] = "top3-drops"
+
+            def select_top10_tab():
+                st.session_state["main_tabs"] = t["tab_drops"]
+                st.query_params["tab"] = "top10"
+                st.session_state["scroll_target"] = "top10-drops"
+
+            # Render action buttons in a row inside the container
+            b_col1, b_col2, b_col3 = st.columns(3)
+            with b_col1:
+                label_t3 = "🔍 Top 3 Drops"
+                st.button(label_t3, key="goto_top3_btn", on_click=select_top3_tab, type="secondary", use_container_width=True)
+            with b_col2:
+                label_t10 = "🔍 Top 10 Drops"
+                st.button(label_t10, key="goto_top10_btn", on_click=select_top10_tab, type="secondary", use_container_width=True)
+            with b_col3:
+                label_lhf = "🎯 Low Hanging Fruits"
+                st.button(label_lhf, key="goto_lhf_btn", on_click=select_lhf_tab, type="secondary", use_container_width=True)
 
     with kpi_col2:
         st.metric(t["kpi_net_change"], net_val_str, delta=pct_val_str)
@@ -781,15 +800,26 @@ We identified <strong style='color: #90c274;'>{lhf_count} Threshold Keywords (Lo
         active_tab = st.session_state.get("main_tabs")
         if active_tab == t["tab_lhf"]:
             st.query_params["tab"] = "lhf"
+        elif active_tab == t["tab_drops"]:
+            st.query_params["tab"] = "drops"
         else:
             if "tab" in st.query_params:
                 del st.query_params["tab"]
 
     # Handle deep-linking on initial load / rerun
     if "tab" in st.query_params and "main_tabs" not in st.session_state:
-        if st.query_params["tab"] == "lhf":
+        param_val = st.query_params["tab"]
+        if param_val == "lhf":
             st.session_state["main_tabs"] = t["tab_lhf"]
-            st.session_state["scroll_to_lhf"] = True
+            st.session_state["scroll_target"] = "low-hanging-fruits"
+        elif param_val == "top3":
+            st.session_state["main_tabs"] = t["tab_drops"]
+            st.session_state["scroll_target"] = "top3-drops"
+        elif param_val == "top10":
+            st.session_state["main_tabs"] = t["tab_drops"]
+            st.session_state["scroll_target"] = "top10-drops"
+        elif param_val == "drops":
+            st.session_state["main_tabs"] = t["tab_drops"]
 
     # --- Visualizations & Tabs ---
     st.header("Details" if lang == "DE" else "Details")
@@ -841,6 +871,7 @@ We identified <strong style='color: #90c274;'>{lhf_count} Threshold Keywords (Lo
         f_page2 = page2_drops[page2_drops['Keyword'].astype(str).str.lower().str.contains(kw_filter, na=False)] if kw_filter else page2_drops
         f_total = total_loss[total_loss['Keyword'].astype(str).str.lower().str.contains(kw_filter, na=False)] if kw_filter else total_loss
         
+        st.markdown("<div id='top3-drops'></div>", unsafe_allow_html=True)
         st.markdown(t["rd_t3_title"])
         if not f_top3.empty:
             st.write(f"{t['rd_sum']} **{format_num(f_top3['Clicks Loss'].sum())}**")
@@ -848,6 +879,7 @@ We identified <strong style='color: #90c274;'>{lhf_count} Threshold Keywords (Lo
         else:
             st.info(t["rd_t3_empty"])
             
+        st.markdown("<div id='top10-drops'></div>", unsafe_allow_html=True)
         st.markdown(t["rd_t10_title"])
         if not f_top10.empty:
             st.write(f"{t['rd_sum']} **{format_num(f_top10['Clicks Loss'].sum())}**")
@@ -942,22 +974,23 @@ We identified <strong style='color: #90c274;'>{lhf_count} Threshold Keywords (Lo
             
         display_styled_dataframe(f_df, sort_col='Clicks Change', ascending=False)
 
-        # Execute smooth scroll down to Low Hanging Fruits if flag is set
-        if st.session_state.get("scroll_to_lhf"):
+        # Execute smooth scroll down to selected target if flag is set
+        if st.session_state.get("scroll_target"):
+            target_id = st.session_state["scroll_target"]
             components.html(
-                """
+                f"""
                 <script>
-                    setTimeout(function() {
-                        var el = window.parent.document.getElementById("low-hanging-fruits");
-                        if (el) {
-                            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }
-                    }, 300);
+                    setTimeout(function() {{
+                        var el = window.parent.document.getElementById("{target_id}");
+                        if (el) {{
+                            el.scrollIntoView({{ behavior: 'smooth', block: 'start' }});
+                        }}
+                    }}, 300);
                 </script>
                 """,
                 height=0
             )
-            st.session_state["scroll_to_lhf"] = False
+            st.session_state["scroll_target"] = None
 
 else:
     st.info(translations[lang]["info_upload"])
